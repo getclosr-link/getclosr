@@ -7330,7 +7330,7 @@ history.replaceState({ screen: 'home' }, '');
 <!-- Custom BMC Modal -->
 <script>
 // Feedback: nothing is loaded until this click. The widget then talks only to
-// this site's own /fk path (a Pages Function relays it to the feedback gateway).
+// this site's own /fk path (the Worker relays it to the feedback gateway).
 function feedbackOpen() {
   if (window.FeedbackKit) return window.FeedbackKit.open();
   if (document.querySelector('script[data-fk-loader]')) return; // still loading, it opens itself

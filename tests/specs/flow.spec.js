@@ -171,7 +171,7 @@ test.describe('v2-specific hardening', () => {
     for (const [path, marker] of repoFiles) {
       const res = await page.request.get(path);
       const body = await res.text();
-      // Cloudflare Pages answers unknown paths with 404.html; a local static server
+      // Cloudflare answers unknown paths with 404.html; a local static server
       // answers 404 with its own body. Either way the repo file must never be served,
       // so assert on the payload, not only on the status code.
       expect(res.status(), path).toBe(404);
@@ -214,7 +214,7 @@ test.describe('v2-specific hardening', () => {
 
   test('the footer links to the own imprint, which names the project and its GitHub org only', async ({ page }) => {
     await expect(page.locator('.l-footer-legal a', { hasText: 'Imprint' })).toHaveAttribute('href', '/imprint');
-    // Python's dev server has no clean URLs; Cloudflare Pages serves /imprint from imprint.html.
+    // Python's dev server has no clean URLs; Cloudflare serves /imprint from imprint.html.
     await page.goto('/imprint.html');
     await expect(page.locator('main')).toContainText('The getClosr contributors');
     await expect(page.locator('main a[href="https://github.com/getclosr-link"]')).toHaveCount(1);

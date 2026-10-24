@@ -19,3 +19,6 @@ test-results/
 
 # Share-Export des Tools landet sonst als Riesen-Diff im Arbeitsbaum
 .git_ignore_tmp_*
+
+# Local Worker secrets for wrangler dev
+.dev.vars

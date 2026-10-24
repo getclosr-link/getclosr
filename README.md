@@ -48,7 +48,7 @@ Older v2 to v4 codes still open. Replacing your own list with an imported one is
 
 getClosr is one static HTML page. It has no backend, no database, no analytics, no cookies and no tracking. All processing happens in your browser, and we could not see your answers even if we wanted to.
 
-There is one opt-in exception: the *Send feedback* button at the bottom of the page. Nothing loads until you click it. Then a small form opens, and only what you send leaves the browser: your message, the page address without query or code, your browser type and screen size. It never includes a screenshot, your answers or a code. The form talks to this site's own `/fk` path, which a Cloudflare Pages Function relays to the feedback gateway set in the `FEEDBACKKIT_ORIGIN` environment variable. Without that variable the form does not load at all. The open form also runs Cloudflare Turnstile as a bot check, the only request to a third party, and only after the click.
+There is one opt-in exception: the *Send feedback* button at the bottom of the page. Nothing loads until you click it. Then a small form opens, and only what you send leaves the browser: your message, the page address without query or code, your browser type and screen size. It never includes a screenshot, your answers or a code. The form talks to this site's own `/fk` path, which the Cloudflare Worker in `src/worker.js` relays to the feedback gateway set in the `FEEDBACKKIT_ORIGIN` secret. Without that variable the form does not load at all. The open form also runs Cloudflare Turnstile as a bot check, the only request to a third party, and only after the click.
 
 The full privacy policy is at [getclosr.link/privacy](https://getclosr.link/privacy).
 
@@ -82,7 +82,13 @@ GitHub Actions runs the same suite on every pull request and on every push to `m
 
 ## Deployment
 
-getClosr runs on Cloudflare Pages, connected to this repository: a push to `main` publishes the site. There is no build command, and the build output directory must be `public`. The headers in `public/_headers` (including `Cache-Control: no-store`) only apply when `public` is the deployed directory.
+getClosr runs as a Cloudflare Worker with static assets, connected to this repository through Workers Builds: a push to `main` runs `npx wrangler deploy` and publishes the site. [`wrangler.jsonc`](wrangler.jsonc) serves `public/` as is (clean URLs, `404.html` for unknown paths, headers from `public/_headers`) and sends only `/fk/*` through [`src/worker.js`](src/worker.js). There is no build step.
+
+The feedback relay needs the gateway address as a secret:
+
+```bash
+npx wrangler secret put FEEDBACKKIT_ORIGIN
+```
 
 Check a deploy against the live domain rather than the build log, for example by comparing the byte size with your local file:
 
@@ -90,8 +96,6 @@ Check a deploy against the live domain rather than the build log, for example by
 curl -sL https://getclosr.link/ | wc -c
 wc -c public/index.html
 ```
-
-A manual upload with `npx wrangler pages deploy public --project-name getclosr` creates a deployment, but on a git-connected project it does not take over the production domain.
 
 ## Contributing
 

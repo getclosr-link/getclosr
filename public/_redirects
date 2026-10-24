@@ -1,3 +1,0 @@
-# Cloudflare Pages routing
-# Force-serve robots.txt even if a SPA-fallback is configured.
-/robots.txt /robots.txt 200!

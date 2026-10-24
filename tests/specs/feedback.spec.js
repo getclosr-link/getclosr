@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 // The feedback form is the one opt-in network path: nothing may load before the
-// click, and afterwards the page talks only to its own /fk path (a Pages Function
+// click, and afterwards the page talks only to its own /fk path (the Worker
 // relays it), never to a third-party host.
 
 // Stand-in for the real widget: records how it was loaded and counts open() calls.
