@@ -1,0 +1,22 @@
+name: Idea or feature request
+description: Suggest an improvement to getClosr
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe the situation and what is missing today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How could getClosr help? Mock-ups or sketches are welcome.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: My idea works without an account, a server or tracking

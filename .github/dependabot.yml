@@ -1,0 +1,12 @@
+# Keeps the pinned GitHub Actions commits and the test dependencies current, with a pull request per update.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /tests
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

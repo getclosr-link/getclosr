@@ -1,0 +1,21 @@
+.wrangler/
+
+# Test harness — Playwright deps and run artifacts (not the specs)
+tests/node_modules
+tests/test-results/
+tests/playwright-report/
+
+# BMAD tooling and run artifacts — regenerable, kept out of diffs.
+# A finding worth keeping goes into the docs it affects, or a test that pins it —
+# not into a dated run folder that outlives the line numbers it cites.
+_bmad/
+_bmad-output/
+.claude/
+test-results/
+
+*.bak
+.gbrain-source
+.DS_Store
+
+# Share-Export des Tools landet sonst als Riesen-Diff im Arbeitsbaum
+.git_ignore_tmp_*

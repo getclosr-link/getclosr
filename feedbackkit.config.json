@@ -1,0 +1,39 @@
+{
+  "publicKey": "fk_pub_3c8e51a07d2b",
+  "projectId": "getclosr",
+  "locale": "en",
+  "enabled": true,
+  "askType": true,
+  "templates": [
+    {
+      "type": "bug",
+      "label": "Something broke",
+      "fields": [
+        { "key": "repro", "label": "What did you do?", "kind": "longtext", "required": true },
+        { "key": "actual", "label": "What happened instead?", "kind": "longtext", "required": true }
+      ],
+      "body": [
+        { "heading": "Steps", "template": "{{repro}}" },
+        { "heading": "What happened", "template": "{{actual}}" }
+      ],
+      "tracker": { "labels": ["bug", "source/feedbackkit"] }
+    },
+    {
+      "type": "idea",
+      "label": "Idea",
+      "fields": [
+        { "key": "idea", "label": "What would make getClosr better?", "kind": "longtext", "required": true }
+      ],
+      "body": [{ "heading": "Idea", "template": "{{idea}}" }],
+      "tracker": { "labels": ["enhancement", "source/feedbackkit"] }
+    }
+  ],
+  "llm": { "provider": "off" },
+  "tracker": { "kind": "github", "defaultRepo": "madsbergstroem/getclosr", "patSecret": "GITHUB_PAT_default" },
+  "storage": { "kind": "r2", "publicBaseUrl": "https://pub-478b50ba6d88448ab21c1c105c27d295.r2.dev", "retentionDays": 30 },
+  "auth": { "origins": ["https://getclosr.link", "https://getclosr.pages.dev", "https://*.getclosr.pages.dev"] },
+  "rateLimit": { "perHour": 60 },
+  "capture": { "screenshot": "off", "console": false },
+  "privacyUrl": "https://getclosr.pages.dev/privacy",
+  "turnstile": { "siteKey": "0x4AAAAAAFQOpHr6JvJG-POf", "secret": "TURNSTILE_SECRET_main" }
+}
