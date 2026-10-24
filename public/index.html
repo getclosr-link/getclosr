@@ -336,8 +336,9 @@ body {
 .l-tagline { font-size: 1rem; color: var(--muted); font-weight: 500; margin-bottom: 18px; letter-spacing: 0; }
 .l-sub { font-size: .95rem; color: var(--muted); line-height: 1.6; margin-bottom: 30px; }
 .l-actions { display: flex; flex-direction: column; gap: 10px; }
-.l-privacy-pills { display: flex; justify-content: center; gap: 14px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: .68rem; color: var(--muted); }
-.l-privacy-pills span::before { content: "· "; opacity: .6; }
+.l-privacy-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px; margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border); font-size: .8rem; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
+.l-privacy-pills > span { display: inline-flex; align-items: center; gap: 7px; }
+.l-privacy-pills .btn-ico { color: var(--coral); opacity: .95; }
 
 .l-section { padding: 56px 24px; width: 100%; }
 .l-section-inner { max-width: 580px; margin: 0 auto; }
@@ -1347,7 +1348,7 @@ body.sheet-open { overflow: hidden; }
         <div id="saved-constellations"></div>
       </div>
 
-      <div class="l-privacy-pills"><span>no account</span><span>no server</span><span>no tracking</span></div>
+      <div class="l-privacy-pills"><span><span class="btn-ico" data-ico="user-x"></span>no account</span><span><span class="btn-ico" data-ico="server-off"></span>no server</span><span><span class="btn-ico" data-ico="eye-off"></span>no tracking</span></div>
     </div>
   </section>
 
@@ -4050,6 +4051,7 @@ const UI_ICONS = {
   'coffee': '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>',
   'server-off': '<path d="M7 2h13a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-5"/><path d="M10 10 2.5 2.5C2 2 2 2.5 2 5v3a2 2 0 0 0 2 2h6z"/><path d="M22 17v-1a2 2 0 0 0-2-2h-1"/><path d="M4 14a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16.5l1-.5.5.5-8-8H4z"/><path d="M6 18h.01"/><path d="m2 2 20 20"/>',
   'user-x': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" x2="22" y1="8" y2="13"/><line x1="22" x2="17" y1="8" y2="13"/>',
+  'eye-off': '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
   'key': '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/>',
 };
 
