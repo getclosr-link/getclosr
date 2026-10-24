@@ -34,6 +34,6 @@
   "auth": { "origins": ["https://getclosr.link", "https://getclosr.pages.dev", "https://*.getclosr.pages.dev"] },
   "rateLimit": { "perHour": 60 },
   "capture": { "screenshot": "off", "console": false },
-  "privacyUrl": "https://getclosr.pages.dev/privacy",
+  "privacyUrl": "https://getclosr.link/privacy",
   "turnstile": { "siteKey": "0x4AAAAAAFQOpHr6JvJG-POf", "secret": "TURNSTILE_SECRET_main" }
 }
