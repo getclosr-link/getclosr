@@ -199,3 +199,33 @@ test.describe('comparison card QR', () => {
     await expect(preview.locator('.btn-primary')).toHaveText('Keep them and fill out my list first →');
   });
 });
+
+// Value: protects=truthful comparison persistence and retry; fails_when=quota failure reports success;
+// why_new=existing save test has working storage; seam=none; no_claim=real quota exhaustion (injected).
+test('comparison save retains the form on storage failure and retries exactly once', async ({ page }) => {
+  const a = await code(page, { name: 'Alex', ratings: { 3: { s: 3, g: 0, r: 0, n: '' } } });
+  const b = await code(page, { name: 'Sam', ratings: { 3: { s: 4, g: 0, r: 0, n: '' } } });
+  await compareCodes(page, a, b);
+  await page.click('#res-save-constellation button');
+  await page.fill('#save-const-name', 'Synthetic comparison');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'closr.compare.saved.v1') throw new DOMException('Synthetic full storage', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+    window.__restoreComparisonStorage = () => { Storage.prototype.setItem = original; };
+  });
+  await page.click('.save-const-form button[type="submit"]');
+  await expect(page.locator('#res-save-constellation')).not.toContainText('Saved on this phone');
+  await expect(page.locator('#res-save-constellation [role="status"]')).toContainText('Not saved');
+  await expect(page.locator('#save-const-name')).toHaveValue('Synthetic comparison');
+  expect(await page.evaluate(() => loadConstellations())).toEqual([]);
+  await page.evaluate(() => window.__restoreComparisonStorage());
+  await page.click('.save-const-form button[type="submit"]');
+  await expect(page.locator('#res-save-constellation')).toContainText('Saved on this phone');
+  await page.reload();
+  const saved = await page.evaluate(() => loadConstellations());
+  expect(saved).toHaveLength(1);
+  expect(saved[0]).toMatchObject({ name: 'Synthetic comparison', people: [{ code: a, label: 'Alex' }, { code: b, label: 'Sam' }] });
+});

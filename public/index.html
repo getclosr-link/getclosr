@@ -574,7 +574,7 @@ body {
 .setup-title { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; letter-spacing: -.4px; line-height: 1.15; margin-bottom: 8px; }
 .setup-sub { color: var(--muted); font-size: .9rem; margin-bottom: 22px; line-height: 1.55; }
 .cat-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
-.cat-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; }
+.cat-item { width: 100%; text-align: left; font: inherit; color: inherit; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; }
 .cat-item.on { background: var(--surface); border-color: var(--accent); box-shadow: 0 4px 16px rgba(229, 193, 88, 0.08); }
 .cat-item.off { opacity: 0.45; }
 .cat-item:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26, 23, 16, 0.06); }
@@ -582,6 +582,7 @@ body {
 .cat-item:active { transform: translateY(0); }
 .cat-glyph { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--accent); }
 .cat-glyph svg { width: 100%; height: 100%; }
+.cat-name, .cat-count { display: block; }
 .cat-text { flex: 1; min-width: 0; }
 .cat-name { font-size: .95rem; font-weight: 700; line-height: 1.2; }
 .cat-count { font-size: .72rem; color: var(--muted); margin-top: 2px; }
@@ -707,7 +708,7 @@ body {
 .name-tag.b { background: var(--recv-bg); color: var(--recv-fg); border-color: var(--recv-br); }
 .vs-sep { font-size: .75rem; color: var(--muted); }
 .summary { display: flex; justify-content: space-between; margin-top: 12px; margin-bottom: 12px; }
-.sum-card { flex: 1; text-align: center; cursor: pointer; padding: 8px 0; border-right: 1.5px solid var(--border); transition: all .15s; opacity: 0.5; }
+.sum-card { background: none; border: 0; font: inherit; flex: 1; text-align: center; cursor: pointer; padding: 8px 0; border-right: 1.5px solid var(--border); transition: all .15s; opacity: 0.5; }
 .sum-card:last-child { border-right: none; }
 .sum-card.active, .sum-card:hover { opacity: 1; }
 .sum-card .n { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 900; display: block; line-height: 1; }
@@ -1149,6 +1150,7 @@ body.sheet-open { overflow: hidden; }
 /* Stacked, not two columns: the answer chips carry a name and a word now, so an `auto`
    second column grew until it squeezed the activity title into one word per line. */
 .matrix-row-head {
+  width: 100%; text-align: left; background: none; border: 0; color: inherit; font: inherit;
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -1402,8 +1404,9 @@ body.sheet-open { overflow: hidden; }
       <p class="l-footer-brand"><span class="get">get</span>Closr</p>
       <p class="l-footer-line">Free for everyone. No account, no tracking, your answers stay on your device.</p>
       <div class="l-footer-actions">
-        <a class="bmc-link" href="https://buymeacoffee.com/madsbergstroem" target="_blank" rel="noopener noreferrer" onclick="openCoffeeSheet();return false;"><span class="btn-ico" data-ico="coffee"></span> Buy me a coffee</a>
+        <a class="bmc-link" href="https://buymeacoffee.com/madsbergstroem" target="_blank" rel="noopener noreferrer" onclick="openCoffeeSheet(this);return false;"><span class="btn-ico" data-ico="coffee"></span> Buy me a coffee</a>
         <button type="button" class="bmc-link fk-switch" id="feedback-toggle" role="switch" aria-checked="false" onclick="feedbackToggle()"><span>Send feedback</span><span class="fk-switch-track" aria-hidden="true"></span></button>
+        <span id="feedback-status" role="status"></span>
       </div>
       <p class="l-footer-fk-note" id="feedback-note">Nothing loads until you switch this on. It then pins a small feedback button to the corner so you can report something from any screen (runs Cloudflare's bot check; your list and codes are never sent).</p>
       <div class="l-footer-base">
@@ -1558,7 +1561,7 @@ body.sheet-open { overflow: hidden; }
   <div class="code-wrap">
     <div class="code-section share-primary">
       <div class="code-actions">
-        <button class="btn btn-primary" id="profile-card-btn" onclick="openShareSheet('profile')"><span class="btn-ico" data-ico="share-2"></span> Share…</button>
+        <button class="btn btn-primary" id="profile-card-btn" onclick="openShareSheet('profile', this)"><span class="btn-ico" data-ico="share-2"></span> Share…</button>
       </div>
       <div class="share-preview-note"><span class="btn-ico" data-ico="scan-line"></span><span>Nothing leaves the browser until you pick one and confirm.</span></div>
       <p class="err-msg" id="profile-card-err"></p>
@@ -1649,7 +1652,7 @@ body.sheet-open { overflow: hidden; }
         <div class="names-row" id="res-names" style="margin-bottom:0;"></div>
         <div class="res-actions">
           <div class="res-save-constellation" id="res-save-constellation"></div>
-          <button type="button" class="btn btn-primary res-share-btn" onclick="openShareSheet('group')">Share</button>
+          <button type="button" class="btn btn-primary res-share-btn" onclick="openShareSheet('group', this)">Share</button>
         </div>
       </div>
       
@@ -4407,6 +4410,7 @@ function loadDraftIntoState() {
   state = {
     name: draft.name || '', ratings: draft.ratings || {}, overallNote: draft.overallNote || '',
     hardLimits: draft.hardLimits || '', aftercare: Array.isArray(draft.aftercare) ? draft.aftercare : [],
+    aftercareInCode: !!draft.aftercareInCode,
     completedAt: draft.completedAt || null, activeCatId: draft.activeCatId || null,
   };
   return true;
@@ -4541,7 +4545,7 @@ function previewHomeCode(opts = {}) {
       <div class="code-card-meta">${same ? 'Same as the list on this device' : meta}</div>
     </div>`;
     host.innerHTML = same
-      ? `${card}<button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="clearPendingCode();buildReviewScreen();go('review')">Edit my list</button>`
+      ? `${card}<button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="editOwnList()">Edit my list</button>`
       : pendingCode.theirs
       ? `${card}
     <input id="home-nick" class="home-nick" type="text" maxlength="40" placeholder="Nickname on this device (optional)" aria-label="Local nickname">
@@ -4549,7 +4553,7 @@ function previewHomeCode(opts = {}) {
       : `${card}
     <div class="own-code-q">Whose list is this?</div>
     <div class="own-code-two">
-      <button type="button" class="btn btn-primary" id="home-code-mine" onclick="${rated ? 'openImportModal(pendingCode &amp;&amp; pendingCode.code)' : 'restoreOwnCode()'}">Mine</button>
+      <button type="button" class="btn btn-primary" id="home-code-mine" onclick="${rated ? 'openImportModal(pendingCode &amp;&amp; pendingCode.code, this)' : 'restoreOwnCode()'}">Mine</button>
       <button type="button" class="btn btn-secondary" id="home-code-theirs" onclick="markCodeTheirs()">${escapeHtml(possessive(name))}</button>
     </div>
     ${rated ? `<div class="own-code-sub">Mine replaces the ${rated} answer${rated === 1 ? '' : 's'} on this device.</div>` : ''}`;
@@ -4571,7 +4575,7 @@ function previewHomeCode(opts = {}) {
     <div class="home-replace">
       <div class="home-replace-title">Or replace my own list with it</div>
       <div class="home-replace-note">${rated ? `Overwrites the ${rated} answer${rated === 1 ? '' : 's'} on this device. There is no undo.` : 'Nothing on this device yet — this would become your own list.'}</div>
-      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:9px" onclick="openImportModal(pendingCode &amp;&amp; pendingCode.code)">Preview, then replace</button>
+      <button type="button" class="btn btn-secondary btn-sm" style="margin-top:9px" onclick="openImportModal(pendingCode &amp;&amp; pendingCode.code, this)">Preview, then replace</button>
     </div>
     <button type="button" class="btn-ghost" style="margin-top:8px" onclick="clearPendingCode()">Discard this code</button>`;
   paintIcons(host);
@@ -4769,18 +4773,19 @@ function timeAgo(ts) {
   return Math.floor(s/86400) + 'd ago';
 }
 
+function editOwnList() {
+  if (!loadDraftIntoState()) {
+    const preview = document.getElementById('home-code-preview');
+    if (preview) preview.innerHTML = '<p class="err-msg show" role="status">Your saved list is no longer available. Paste your code again to restore it.</p>';
+    return;
+  }
+  clearPendingCode();
+  buildReviewScreen();
+  go('review');
+}
+
 function resumeDraft() {
-  const draft = loadDraft();
-  if (!draft) return;
-  state = {
-    name: draft.name || '',
-    ratings: draft.ratings || {},
-    overallNote: draft.overallNote || '',
-    hardLimits: draft.hardLimits || '',
-    aftercare: Array.isArray(draft.aftercare) ? draft.aftercare : [],
-    completedAt: draft.completedAt || null,
-    activeCatId: draft.activeCatId || null,
-  };
+  if (!loadDraftIntoState()) return;
   buildFillScreen();
   go('fill');
 }
@@ -4822,6 +4827,7 @@ window.addEventListener('popstate', event => {
 });
 
 function clickStart() {
+  loadDraftIntoState();
   if (!LS.get('closr.onboard')) { buildOnboard(); go('onboard'); }
   else { buildSetupScreen(); go('setup'); }
 }
@@ -4862,8 +4868,10 @@ function goToCode() {
 }
 
 async function shareCode() {
-  const code = document.getElementById('my-code-display').textContent;
-  if (!navigator.share) { copyCode(); return; }
+  const result = shareCodeResult('code');
+  if (result.status !== 'ready') return;
+  const code = result.code;
+  if (!navigator.share) { copyCode(code); return; }
   try {
     await navigator.share({ title: 'My GetClosr code', text: code });
   } catch (e) { /* user cancelled */ }
@@ -4917,7 +4925,7 @@ function goToCompareProfiles() {
 // Import is deliberately a two-step flow. Decoding a code only fills this temporary
 // object; the local draft is replaced exactly once, after the owner presses confirm.
 let pendingImportData = null;
-function openImportModal(code = '') {
+function openImportModal(code = '', opener = document.activeElement) {
   const modal = document.getElementById('import-modal');
   const input = document.getElementById('import-code');
   if (!modal || !input) return;
@@ -4928,12 +4936,13 @@ function openImportModal(code = '') {
   input.value = code || '';
   modal.classList.add('on');
   if (input.value.trim()) previewImportCode();
-  else setTimeout(() => input.focus(), 0);
+  activateDialog('import-modal', opener);
 }
 
 function closeImportModal() {
   const modal = document.getElementById('import-modal');
   if (modal) modal.classList.remove('on');
+  releaseDialog('import-modal');
   pendingImportData = null;
 }
 
@@ -5290,7 +5299,7 @@ const SHARE_TABS = {
       ['warn', 'Anyone holding this code holds your complete list.'],
     ],
     primary: 'Copy',
-    run: () => copyCode(currentPrivateCode()),
+    run: () => copyShareCode('code'),
   },
   groupcode: {
     label: 'Group code',
@@ -5303,9 +5312,9 @@ const SHARE_TABS = {
       ['warn', 'Anyone holding this code holds all of these lists. Share it only with the people in it.'],
     ],
     primary: 'Copy',
-    available: () => !!currentGroupCode(),
+    available: () => shareSources('groupcode').length >= 2 && shareSources('groupcode').every(Boolean),
     unavailable: 'Compare at least two profiles first.',
-    run: () => copyCode(currentGroupCode()),
+    run: () => copyShareCode('groupcode'),
   },
 };
 
@@ -5316,15 +5325,26 @@ function comparisonSize() {
 // Built from the codes the comparison was started with, not from currentComparison:
 // those profiles are normalised for display and have lost the overall notes. Local
 // nicknames stay on this device, so each profile keeps the name its owner chose.
-function currentGroupCode() {
-  const profiles = shareSources('groupcode');
-  if (profiles.length < 2 || profiles.some(p => !p)) return '';
-  const parts = shareParts('groupcode');
-  try { return encodeGroup(profiles.map(p => withShareParts(p, parts))); } catch (e) { return ''; }
+function shareCodeResult(key) {
+  const profiles = shareSources(key);
+  if (!profiles.length || (key === 'groupcode' && profiles.length < 2)) return { status: 'empty', code: '', message: '' };
+  if (profiles.some(p => !p)) return { status: 'invalid', code: '', message: 'A list could not be read. Paste the original code again.' };
+  try {
+    const selected = profiles.map(p => withShareParts(p, shareParts(key)));
+    const code = key === 'groupcode' ? encodeGroup(selected) : encode(selected[0]);
+    return { status: 'ready', code, message: '' };
+  } catch (e) {
+    return { status: e instanceof RangeError ? 'too-large' : 'invalid', code: '', message: e.message || 'That code could not be prepared.' };
+  }
 }
 
-function currentPrivateCode() {
-  try { return encode(withShareParts(state, shareParts('code'))); } catch (e) { return ''; }
+function currentGroupCode() { return shareCodeResult('groupcode').code; }
+function currentPrivateCode() { return shareCodeResult('code').code; }
+
+function copyShareCode(key) {
+  const result = shareCodeResult(key);
+  if (result.status !== 'ready') throw new Error(result.message || 'That code is not ready to share.');
+  return copyCode(result.code);
 }
 
 // What goes into a private or group code is chosen each time the sheet opens. Ratings
@@ -5405,29 +5425,82 @@ function currentPublicGroupCode() {
   try { return encodePublicGroup(profiles.map(p => ({ ...p, hardLimits: '' }))); } catch (e) { return ''; }
 }
 
-function openShareSheet(tab) {
+// Keep the active dialog reachable while making every background branch inert.
+let activeDialog = null;
+function dialogControls(el) {
+  return [...el.querySelectorAll('button, a[href], input, textarea, select, iframe, [tabindex]')]
+    .filter(node => !node.disabled && node.tabIndex >= 0 && !node.closest('[inert]') && node.getClientRects().length);
+}
+function focusDialog(el) {
+  const target = dialogControls(el)[0] || el;
+  if (target === el) el.tabIndex = -1;
+  target.focus();
+}
+function activateDialog(id, opener = document.activeElement) {
+  const el = document.getElementById(id);
+  if (!el || activeDialog?.el === el) return;
+  if (activeDialog) dismissActiveDialog();
+  const inert = new Map();
+  for (let branch = el; branch.parentElement; branch = branch.parentElement) {
+    for (const sibling of branch.parentElement.children) {
+      if (sibling === branch) continue;
+      inert.set(sibling, sibling.inert);
+      sibling.inert = true;
+    }
+  }
+  activeDialog = { el, opener, inert };
+  focusDialog(el);
+}
+function releaseDialog(id) {
+  if (!activeDialog || activeDialog.el.id !== id) return;
+  const { opener, inert } = activeDialog;
+  activeDialog = null;
+  for (const [el, value] of inert) el.inert = value;
+  if (opener?.isConnected && !opener.closest('[inert]') && opener.getClientRects().length) opener.focus();
+}
+function dismissActiveDialog() {
+  const close = { 'share-sheet': closeShareSheet, 'import-modal': closeImportModal,
+    'coffee-sheet': closeCoffeeSheet, 'fill-overview': closeFillOverview };
+  close[activeDialog?.el.id]?.();
+}
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Tab' || !activeDialog) return;
+  const el = activeDialog.el;
+  const controls = dialogControls(el);
+  const first = controls[0], last = controls[controls.length - 1];
+  if (!first) { event.preventDefault(); el.focus(); return; }
+  if (!el.contains(document.activeElement) || (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+    event.preventDefault(); (event.shiftKey ? last : first).focus();
+  }
+});
+
+function openShareSheet(tab, opener = document.activeElement) {
   const sheet = document.getElementById('share-sheet');
   if (!sheet) return;
   sharePartChoices = {};
   shareTab = tab && SHARE_TABS[tab] && SHARE_TABS[tab].privacy === 'private' ? tab : null;
   sheet.classList.add('on');
   renderShareSheet();
+  activateDialog('share-sheet', opener);
 }
 
 const COFFEE_WIDGET_URL = 'https://buymeacoffee.com/widget/page/madsbergstroem?description=Support%20getClosr&color=%23d14836';
 
-function openCoffeeSheet() {
+function openCoffeeSheet(opener = document.activeElement) {
   const frame = document.getElementById('coffee-frame');
   if (frame && !frame.src) frame.src = COFFEE_WIDGET_URL;
   document.getElementById('coffee-sheet')?.classList.add('on');
+  activateDialog('coffee-sheet', opener);
 }
 
 function closeCoffeeSheet() {
   document.getElementById('coffee-sheet')?.classList.remove('on');
+  releaseDialog('coffee-sheet');
 }
 
 function closeShareSheet() {
   document.getElementById('share-sheet')?.classList.remove('on');
+  releaseDialog('share-sheet');
 }
 
 function setShareTab(tab) {
@@ -5442,16 +5515,18 @@ function setShareTab(tab) {
 function renderShareSheet() {
   const body = document.getElementById('share-sheet-body');
   if (!body) return;
+  const focusId = body.contains(document.activeElement) ? document.activeElement.id : '';
   // The sheet also opens from the results screen, before the code screen ever ran; build
-  // the private code here so that row is never an empty box. No ratings, no row.
-  if (countRated() > 0) { try { state.myCode = encode(state); } catch (e) { /* hard limit too long: row hidden */ } }
+  // the private row whenever there are ratings, including when its code needs reducing.
+  const hasOwnRatings = countRated() > 0;
   const text = v => (typeof v === 'function' ? v() : v);
   const row = key => {
     const spec = SHARE_TABS[key];
     if (spec.available && !spec.available()) return '';
-    if (key === 'code' && !state.myCode) return '';
+    if (key === 'code' && !hasOwnRatings) return '';
     const open = key === shareTab && spec.privacy === 'private';
-    const code = key === 'code' ? currentPrivateCode() : key === 'groupcode' ? currentGroupCode() : '';
+    const result = spec.privacy === 'private' ? shareCodeResult(key) : { status: 'empty', code: '', message: '' };
+    const code = result.code;
     return `
       <div class="share-opt${open ? ' open' : ''}">
         <button type="button" class="share-opt-head" id="share-tab-${key}" aria-expanded="${open}" onclick="pickShareOption('${key}')">
@@ -5462,9 +5537,10 @@ function renderShareSheet() {
           ${sharePartsHtml(key)}
           <div class="code-display" id="${key === 'code' ? 'my-code-display' : 'group-code-display'}">${escapeHtml(code)}</div>
           <div class="share-opt-warn" id="share-parts-warn">${escapeHtml(sharePartsWarning(key))}</div>
+          ${result.message ? `<p class="err-msg show" role="status">${escapeHtml(result.message)}</p>` : ''}
           <div class="share-opt-actions">
-            <button type="button" class="btn btn-primary" id="share-sheet-primary" onclick="runShareAction()">Copy</button>
-            ${key === 'code' && navigator.share ? '<button type="button" class="btn btn-secondary" onclick="shareCode()">Send via app</button>' : ''}
+            <button type="button" class="btn btn-primary" id="share-sheet-primary" ${result.status !== 'ready' ? 'disabled' : ''} onclick="runShareAction()">Copy</button>
+            ${key === 'code' && navigator.share ? `<button type="button" class="btn btn-secondary" ${result.status !== 'ready' ? 'disabled' : ''} onclick="shareCode()">Send via app</button>` : ''}
           </div></div>` : ''}
       </div>`;
   };
@@ -5473,6 +5549,10 @@ function renderShareSheet() {
     <div class="share-grp"><div class="share-grp-title">Only for people you trust</div><div class="share-grp-sub">Codes you choose the contents of</div>${row('code')}${row('groupcode')}</div>`;
   const err = document.getElementById('share-sheet-err');
   if (err) { err.classList.remove('show'); err.textContent = ''; }
+  if (activeDialog?.el.id === 'share-sheet' && focusId) {
+    const target = document.getElementById(focusId);
+    if (target) target.focus(); else focusDialog(activeDialog.el);
+  }
 }
 
 function pickShareOption(key) {
@@ -5987,9 +6067,11 @@ function readProfileBody(buf, cursor, need) {
 
 function codeFromPayload(version, payload) {
   const packed = fflate.deflateSync(Uint8Array.from(payload), { level: 9 });
-  return packed.length < payload.length
+  const code = packed.length < payload.length
     ? codeFromBytes([version, FLAG_DEFLATED, ...packed])
     : codeFromBytes([version, 0, ...payload]);
+  if (code.length > MAX_CODE_CHARS) throw new RangeError('This code is too long to share. Leave out comments or notes and try again.');
+  return code;
 }
 
 function payloadFromBytes(buf) {
@@ -6363,7 +6445,7 @@ function buildQuestionView(cat, idx) {
       <div class="q-fields" aria-hidden="true"><i class="qf-bord"></i><i class="qf-red"></i></div>
       <div class="q-top">
         <span>${escapeHtml(cat.short)} · ${idx + 1} / ${cat.items.length}</span>
-        <button class="q-link" onclick="openFillOverview()">Overview</button>
+        <button class="q-link" onclick="openFillOverview(this)">Overview</button>
       </div>
       <div class="q-head">
         <div class="q-eyebrow">How much do you want this</div>
@@ -6438,18 +6520,20 @@ function prevQuestion() {
   buildSetupScreen(); go('setup');
 }
 
-function openFillOverview() {
+function openFillOverview(opener = document.activeElement) {
   const el = document.getElementById('fill-overview');
   if (!el) return;
   renderFillOverview();
   el.hidden = false;
   document.body.classList.add('sheet-open');
+  activateDialog('fill-overview', opener);
 }
 
 function closeFillOverview() {
   const el = document.getElementById('fill-overview');
   if (el) el.hidden = true;
   document.body.classList.remove('sheet-open');
+  releaseDialog('fill-overview');
 }
 
 function renderFillOverview() {
@@ -6801,8 +6885,7 @@ function saveConstellation(name, people) {
   const list = loadConstellations();
   list.push({ id: Date.now(), name: String(name || '').trim(), savedAt: Date.now(), people });
   while (list.length > COMPARE_SAVED_MAX) list.shift();
-  LS.set(COMPARE_SAVED_KEY, JSON.stringify(list));
-  return list;
+  return LS.set(COMPARE_SAVED_KEY, JSON.stringify(list));
 }
 
 function deleteConstellation(id) {
@@ -6833,7 +6916,18 @@ function promptSaveConstellation() {
 function confirmSaveConstellation() {
   if (!currentComparisonInputs || currentComparisonInputs.length < 2) return;
   const name = (document.getElementById('save-const-name')?.value || '').trim();
-  saveConstellation(name, currentComparisonInputs);
+  if (!saveConstellation(name, currentComparisonInputs)) {
+    const form = document.querySelector('#res-save-constellation form');
+    let status = form && form.querySelector('[role="status"]');
+    if (form && !status) {
+      status = document.createElement('p');
+      status.className = 'err-msg show';
+      status.setAttribute('role', 'status');
+      form.appendChild(status);
+    }
+    if (status) status.textContent = 'Not saved: browser storage is unavailable. Keep this page open and try again.';
+    return;
+  }
   renderSavedConstellations();
   const host = document.getElementById('res-save-constellation');
   if (host) host.innerHTML = '<div class="saved-const-ok" role="status"><b>✓ Saved on this phone</b><span>Open it again from the start page, under Saved comparisons.</span></div>';
@@ -7009,7 +7103,7 @@ function buildResultsScreen(result, filter) {
     { label: 'Discuss', count: buckets.discuss.length, type: 'discuss', key: 'discuss' },
     { label: 'Gap', count: buckets.gap.length, type: 'gap', key: 'gap' },
   ];
-  document.getElementById('res-summary').innerHTML = cards.map(c => `<div class="sum-card ${c.type} ${filter === c.key ? 'active' : ''}" onclick="resultsScopeCat = null; showResultsList('${c.key}')" role="button" tabindex="0"><span class="n">${c.count}</span><span class="l">${c.label}</span></div>`).join('');
+  document.getElementById('res-summary').innerHTML = cards.map(c => `<button type="button" class="sum-card ${c.type} ${filter === c.key ? 'active' : ''}" onclick="resultsScopeCat = null; showResultsList('${c.key}')" aria-pressed="${filter === c.key}"><span class="n">${c.count}</span><span class="l">${c.label}</span></button>`).join('');
 
   buildResultsOverview(result, filter);
   renderResultsTabs();
@@ -7104,16 +7198,16 @@ function buildResultsScreen(result, filter) {
           <p class="res-notes-foot">Comments stay on this device and in the private code — never on a shared card.</p>
         </div>` : '';
 
-      html += `<div class="matrix-row ${status}" onclick="this.classList.toggle('open')">
-                 <div class="matrix-row-head">
-                   <div class="matrix-act-info">
+      html += `<div class="matrix-row ${status}">
+                 <button type="button" class="matrix-row-head" aria-expanded="false" aria-controls="activity-details-${row.id}" onclick="toggleActivityDetails(this)">
+                   <span class="matrix-act-info">
                      <span class="matrix-act-name">${escapeHtml(act.label)} ${act.highRisk ? '<span class="res-risk">Needs context</span>' : ''}${noteCount ? `<span class="res-note-badge">${noteCount} comment${noteCount === 1 ? '' : 's'}</span>` : ''}</span>
                      <span class="matrix-act-meta">${pairText}</span>
-                   </div>
-                   <div class="matrix-cells">${cellsHtml}</div>
+                   </span>
+                   <span class="matrix-cells">${cellsHtml}</span>
                    ${anyDiffers ? '<span class="matrix-differs">Some answers differ by axis — open the row to see Solo, Giving and Receiving separately.</span>' : ''}
-                 </div>
-                 <div class="matrix-row-details">${axisBlocks}${notesHtml}</div>
+                 </button>
+                 <div class="matrix-row-details" id="activity-details-${row.id}">${axisBlocks}${notesHtml}</div>
                </div>`;
     });
   });
@@ -7254,6 +7348,12 @@ function personBlockHtml(name, rating, cls, actId) {
 // ══════════════════════════════
 //  ADMIN: SETUP SCREEN
 // ══════════════════════════════
+function toggleActivityDetails(button) {
+  const open = button.getAttribute('aria-expanded') !== 'true';
+  button.setAttribute('aria-expanded', String(open));
+  button.closest('.matrix-row').classList.toggle('open', open);
+}
+
 function buildSetupScreen() {
   const hidden = getHiddenCats();
   const list = document.getElementById('setup-cat-list');
@@ -7263,14 +7363,14 @@ function buildSetupScreen() {
     const hasRisk = cat.items.some(([,, hr]) => hr);
     const subtitle = `${itemCount} items${hasRisk ? '<span class="cat-edge-tag"> · edge</span>' : ''}`;
     const glyph = CAT_GLYPHS[cat.id] || '<circle cx="12" cy="12" r="6"/>';
-    return `<div class="cat-item ${on ? 'on' : 'off'}" data-cat="${cat.id}" onclick="toggleSetupCat('${cat.id}')">
+    return `<button type="button" aria-pressed="${on}" class="cat-item ${on ? 'on' : 'off'}" data-cat="${cat.id}" onclick="toggleSetupCat('${cat.id}')">
       <span class="cat-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${glyph}</svg></span>
-      <div class="cat-text">
-        <div class="cat-name">${cat.title}</div>
-        <div class="cat-count">${subtitle}</div>
-      </div>
-      <div class="cat-check" aria-hidden="true"></div>
-    </div>`;
+      <span class="cat-text">
+        <span class="cat-name">${cat.title}</span>
+        <span class="cat-count">${subtitle}</span>
+      </span>
+      <span class="cat-check" aria-hidden="true"></span>
+    </button>`;
   }).join('');
   updateSetupCount();
 }
@@ -7286,6 +7386,7 @@ function toggleSetupCat(id) {
     const on = !hidden.includes(id);
     el.classList.toggle('on', on);
     el.classList.toggle('off', !on);
+    el.setAttribute('aria-pressed', String(on));
   }
   updateSetupCount();
 }
@@ -7358,29 +7459,42 @@ function feedbackToggle(force) {
     }
     return;
   }
+  document.getElementById('feedback-status').textContent = '';
   if (host) host.style.display = '';
   if (window.FeedbackKit) return window.FeedbackKit.open();
-  if (document.querySelector('script[data-fk-loader]')) return; // still loading, it opens itself
+  if (document.querySelector('script[data-fk-loader]')) return;
   const s = document.createElement('script');
   s.src = '/fk/widget.js';
   s.dataset.project = 'fk_pub_3c8e51a07d2b';
   s.dataset.base = '/fk';
-  s.dataset.autoopen = '';
   s.setAttribute('data-fk-loader', '');
+  const isCurrent = () => document.querySelector('script[data-fk-loader]') === s;
+  s.onerror = () => {
+    if (!isCurrent()) return;
+    s.remove();
+    btn.setAttribute('aria-checked', 'false');
+    document.getElementById('feedback-status').textContent = 'Feedback could not load. Turn the switch on to try again.';
+  };
+  s.onload = () => {
+    if (!isCurrent()) return;
+    if (!window.FeedbackKit) { s.onerror(); return; }
+    const enabled = btn.getAttribute('aria-checked') === 'true';
+    const loadedHost = document.querySelector('[data-feedbackkit="host"]');
+    if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
+    if (enabled) window.FeedbackKit.open();
+  };
   document.body.appendChild(s);
 }
 const feedbackOpen = () => feedbackToggle(true);
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  if (activeDialog) { e.preventDefault(); dismissActiveDialog(); return; }
   const fkHost = document.querySelector('[data-feedbackkit="host"]');
   const fkBackdrop = fkHost && fkHost.shadowRoot && fkHost.shadowRoot.querySelector('.fk-backdrop');
   if (fkBackdrop && !fkBackdrop.hidden) {
     const x = fkHost.shadowRoot.querySelector('.fk-x');
     if (x) x.click();
   }
-  closeImportModal();
-  closeShareSheet();
-  closeCoffeeSheet();
 });
 </script>
 </body>
