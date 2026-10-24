@@ -29,7 +29,7 @@
     }
   ],
   "llm": { "provider": "off" },
-  "tracker": { "kind": "github", "defaultRepo": "madsbergstroem/getclosr", "patSecret": "GITHUB_PAT_default" },
+  "tracker": { "kind": "github", "defaultRepo": "getclosr-link/getclosr-dev", "patSecret": "GITHUB_PAT_getclosr" },
   "storage": { "kind": "r2", "publicBaseUrl": "https://pub-478b50ba6d88448ab21c1c105c27d295.r2.dev", "retentionDays": 30 },
   "auth": { "origins": ["https://getclosr.link", "https://getclosr.pages.dev", "https://*.getclosr.pages.dev"] },
   "rateLimit": { "perHour": 60 },
