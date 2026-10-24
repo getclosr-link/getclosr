@@ -36,10 +36,6 @@
   <img alt="GitHub Actions" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088ff?style=flat-square&logo=githubactions&logoColor=2088ff&labelColor=1c1a3e">
 </p>
 
-<p align="center">
-  <img src="docs/images/home.png" alt="The getClosr home screen: Map your desires. Privately., with buttons to fill out a list or paste a code" width="80%">
-</p>
-
 ## How it works
 
 <table>
