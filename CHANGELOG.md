@@ -15,6 +15,8 @@ to `main`; a release marks a tested state worth naming.
 
 ### Fixed
 
+- Category choices, result filters and activity details work from the keyboard. Dialogs contain focus and return it when closed.
+
 - The privacy notice distinguishes discarding a draft from clearing all site data.
 
 - Oversized private and group exports explain how to reduce the code before copying it.
