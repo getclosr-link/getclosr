@@ -67,7 +67,11 @@
     }
   ],
   "llm": {
-    "provider": "off"
+    "provider": "custom",
+    "baseUrl": "https://litellm.trufflecraft.de/v1",
+    "model": "antigravity-flash-lite",
+    "dailyBudget": 200,
+    "structuredOutput": true
   },
   "tracker": {
     "kind": "github",
@@ -97,5 +101,6 @@
   "turnstile": {
     "siteKey": "0x4AAAAAAFQOpHr6JvJG-POf",
     "secret": "TURNSTILE_SECRET_main"
-  }
+  },
+  "issueLink": false
 }
