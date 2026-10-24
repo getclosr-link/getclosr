@@ -75,7 +75,7 @@
   },
   "tracker": {
     "kind": "github",
-    "defaultRepo": "getclosr-link/getclosr-dev",
+    "defaultRepo": "getclosr-link/getclosr",
     "patSecret": "GITHUB_PAT_getclosr"
   },
   "storage": {
