@@ -4824,6 +4824,7 @@ window.addEventListener('popstate', event => {
 });
 
 function clickStart() {
+  loadDraftIntoState();
   if (!LS.get('closr.onboard')) { buildOnboard(); go('onboard'); }
   else { buildSetupScreen(); go('setup'); }
 }

@@ -281,3 +281,21 @@ for (const path of ['resume', 'home comparison']) {
     });
   }
 }
+
+// Value: protects=saved answers during category editing after reload; seam=synthetic draft.
+test('editing categories after reload preserves the saved profile when another answer changes', async ({ page }) => {
+  const original = { name: 'Alex', ratings: { 3: { s: 3, g: 1, r: 0, n: 'Synthetic note' } },
+    overallNote: 'Synthetic overall note', hardLimits: 'Synthetic boundary', aftercare: ['Water'], aftercareInCode: true };
+  await page.evaluate(draft => {
+    localStorage.setItem('closr.draft.v1', JSON.stringify(draft));
+    localStorage.setItem('closr.onboard', '1');
+  }, original);
+  await page.reload();
+  await page.getByRole('button', { name: 'Edit categories', exact: true }).click();
+  await page.locator('#s-setup button').filter({ hasText: 'Continue' }).click();
+  await expect(page.locator('#s-fill')).toHaveClass(/on/);
+  await page.evaluate(() => setHeatRating(5, 's', 4));
+  const saved = await page.evaluate(() => loadDraft());
+  expect(saved).toMatchObject(original);
+  expect(saved.ratings[5].s).toBe(4);
+});
