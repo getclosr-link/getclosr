@@ -38,9 +38,8 @@ nothing leaves the device; the copy has to keep proving it.
 
 ## Emoji
 
-**Not used as UI, ever.** `☕` on the Buy-Me-a-Coffee button is the only one that ships,
-and it sits outside the app proper. Marks inside the app are icons or typographic symbols,
-never pictograms. An emoji in a row breaks the register immediately.
+**Not used as UI, ever.** Marks in the app, the footer included, are icons or typographic
+symbols, never pictograms. An emoji in a row breaks the register immediately.
 
 ## Chrome palette
 

@@ -787,18 +787,6 @@ body {
 .sheet-head h2 { font-family: var(--font-serif); font-weight: 700; font-size: var(--t-h2); margin: 0; }
 .sheet-close { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; min-height: 32px; border: 0; background: none; color: var(--muted); cursor: pointer; border-radius: 50%; }
 .sheet-close:hover { background: var(--surface2); color: var(--text); }
-/* Coffee sheet — the Buy Me a Coffee form loads into the iframe only when the sheet opens,
-   so a visit without that tap still makes no request to another host. */
-.coffee-sub { font-size: var(--t-sm); color: var(--muted); margin: -4px 0 12px; }
-.coffee-embed { height: min(560px, 62vh); border-radius: 16px; overflow: hidden; background: #fff; }
-.coffee-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
-.coffee-note { font-size: .72rem; color: var(--muted); text-align: center; margin-top: 10px; }
-.coffee-note a { color: var(--coral); }
-@media (min-width: 700px) {
-  #coffee-sheet { align-items: center; }
-  #coffee-sheet .sheet { width: 460px; border-bottom: 1.5px solid var(--border); border-radius: 22px; }
-  #coffee-sheet .sheet-grab { display: none; }
-}
 .sheet-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; padding: 3px; background: var(--bg); border: 1px solid var(--border); border-radius: 19px; margin-bottom: 14px; }
 .sheet-tab { height: 32px; padding: 0 6px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--muted); font-family: inherit; font-size: var(--t-sm); font-weight: 700; cursor: pointer; }
 .sheet-tab.on { background: var(--text); color: var(--bg); }
@@ -1404,7 +1392,7 @@ body.sheet-open { overflow: hidden; }
       <p class="l-footer-brand"><span class="get">get</span>Closr</p>
       <p class="l-footer-line">Free for everyone. No account, no tracking, your answers stay on your device.</p>
       <div class="l-footer-actions">
-        <a class="bmc-link" href="https://buymeacoffee.com/madsbergstroem" target="_blank" rel="noopener noreferrer" onclick="openCoffeeSheet(this);return false;"><span class="btn-ico" data-ico="coffee"></span> Buy me a coffee</a>
+        <a class="bmc-link" id="sponsor-link" href="https://github.com/sponsors/getclosr-link" target="_blank" rel="noopener noreferrer"><span class="btn-ico" data-ico="heart"></span> Sponsor</a>
         <button type="button" class="bmc-link fk-switch" id="feedback-toggle" role="switch" aria-checked="false" onclick="feedbackToggle()"><span>Send feedback</span><span class="fk-switch-track" aria-hidden="true"></span></button>
         <span id="feedback-status" role="status"></span>
       </div>
@@ -1679,20 +1667,6 @@ body.sheet-open { overflow: hidden; }
   <div id="res-filters"></div>
   <div id="res-body"></div>
   <button class="fab" onclick="go('code')">← <span class="nav-word">Back to Code</span></button>
-</div>
-
-<!-- COFFEE SHEET — the iframe has no src until the sheet opens; see openCoffeeSheet(). -->
-<div class="sheet-overlay" id="coffee-sheet" role="dialog" aria-modal="true" aria-labelledby="coffee-sheet-title" onclick="if(event.target===this)closeCoffeeSheet()">
-  <div class="sheet">
-    <div class="sheet-grab" aria-hidden="true"></div>
-    <div class="sheet-head">
-      <h2 id="coffee-sheet-title">Buy me a coffee</h2>
-      <button type="button" class="sheet-close" onclick="closeCoffeeSheet()" aria-label="Close"><span class="btn-ico" data-ico="x"></span></button>
-    </div>
-    <p class="coffee-sub">getClosr is free. If it helped, a coffee keeps it that way.</p>
-    <div class="coffee-embed"><iframe id="coffee-frame" title="Buy Me a Coffee" allow="payment"></iframe></div>
-    <p class="coffee-note">Payment runs through Buy Me a Coffee. <a href="https://buymeacoffee.com/madsbergstroem" target="_blank" rel="noopener noreferrer">Open in a new tab</a></p>
-  </div>
 </div>
 
 <!-- SHARE SHEET — one surface for every way out of the app, so each option states what it
@@ -4067,7 +4041,7 @@ const UI_ICONS = {
   'clipboard-copy': '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M16 4h2a2 2 0 0 1 2 2v4"/><path d="M21 14H11"/><path d="m15 10-4 4 4 4"/>',
   'share-2': '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>',
   'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
-  'coffee': '<path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/>',
+  'heart': '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/>',
   'server-off': '<path d="M7 2h13a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-5"/><path d="M10 10 2.5 2.5C2 2 2 2.5 2 5v3a2 2 0 0 0 2 2h6z"/><path d="M22 17v-1a2 2 0 0 0-2-2h-1"/><path d="M4 14a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16.5l1-.5.5.5-8-8H4z"/><path d="M6 18h.01"/><path d="m2 2 20 20"/>',
   'user-x': '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" x2="22" y1="8" y2="13"/><line x1="22" x2="17" y1="8" y2="13"/>',
   'eye-off': '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
@@ -5476,7 +5450,7 @@ function releaseDialog(id) {
 }
 function dismissActiveDialog() {
   const close = { 'share-sheet': closeShareSheet, 'import-modal': closeImportModal,
-    'coffee-sheet': closeCoffeeSheet, 'fill-overview': closeFillOverview };
+    'fill-overview': closeFillOverview };
   close[activeDialog?.el.id]?.();
 }
 document.addEventListener('keydown', event => {
@@ -5498,20 +5472,6 @@ function openShareSheet(tab, opener = document.activeElement) {
   sheet.classList.add('on');
   renderShareSheet();
   activateDialog('share-sheet', opener);
-}
-
-const COFFEE_WIDGET_URL = 'https://buymeacoffee.com/widget/page/madsbergstroem?description=Support%20getClosr&color=%23d14836';
-
-function openCoffeeSheet(opener = document.activeElement) {
-  const frame = document.getElementById('coffee-frame');
-  if (frame && !frame.src) frame.src = COFFEE_WIDGET_URL;
-  document.getElementById('coffee-sheet')?.classList.add('on');
-  activateDialog('coffee-sheet', opener);
-}
-
-function closeCoffeeSheet() {
-  document.getElementById('coffee-sheet')?.classList.remove('on');
-  releaseDialog('coffee-sheet');
 }
 
 function closeShareSheet() {

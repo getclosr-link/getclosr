@@ -13,23 +13,21 @@ to `main`; a release marks a tested state worth naming.
 
 ## [Unreleased]
 
+### Changed
+
+- Support moved from Buy Me a Coffee to [GitHub Sponsors](https://github.com/sponsors/getclosr-link) for the organization. The footer link is a plain link; the embedded payment form and its privacy section are gone, and no personal handle ships with the site.
+
 ### Fixed
 
 - Profile cards omit empty hard limits and center the QR panel when no limits are shared.
 - Your name is editable directly on Review and stays in sync with Overview and the saved list.
 - The feedback switch waits for the widget’s asynchronous configuration before treating it as ready.
 - The imprint and privacy page include the public contact address hello@getclosr.link.
-
 - Aftercare keeps the centered questionnaire layout instead of stretching across the screen.
-
 - A failed feedback load can be retried, and switching feedback off prevents a delayed load from opening it.
-
 - Category choices, result filters and activity details work from the keyboard. Dialogs contain focus and return it when closed.
-
 - The privacy notice distinguishes discarding a draft from clearing all site data.
-
 - Oversized private and group exports explain how to reduce the code before copying it.
-
 - Editing your own code after a reload retains your saved answers and aftercare sharing choice.
 - A failed comparison save keeps the form open and reports the storage error so you can retry.
 
