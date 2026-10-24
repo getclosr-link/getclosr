@@ -15,6 +15,8 @@ to `main`; a release marks a tested state worth naming.
 
 ### Fixed
 
+- The privacy notice distinguishes discarding a draft from clearing all site data.
+
 - Oversized private and group exports explain how to reduce the code before copying it.
 
 - Editing your own code after a reload retains your saved answers and aftercare sharing choice.
