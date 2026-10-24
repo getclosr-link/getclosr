@@ -18,9 +18,9 @@
 
 <table align="center">
   <tr>
-    <td align="center" width="33%"><b>No account</b><br><sub>No sign-up, no login, no email.</sub></td>
-    <td align="center" width="33%"><b>No server</b><br><sub>Your answers stay in your browser. The code <i>is</i> your data.</sub></td>
-    <td align="center" width="33%"><b>No tracking</b><br><sub>No analytics, no cookies, no third-party requests.</sub></td>
+    <td align="center" width="33%"><img src="docs/images/glyphs/no-account.svg" width="40" alt=""><br><b>No account</b><br><sub>No sign-up, no login, no email.</sub></td>
+    <td align="center" width="33%"><img src="docs/images/glyphs/no-server.svg" width="40" alt=""><br><b>No server</b><br><sub>Your answers stay in your browser.<br>The code <i>is</i> your data.</sub></td>
+    <td align="center" width="33%"><img src="docs/images/glyphs/no-tracking.svg" width="40" alt=""><br><b>No tracking</b><br><sub>No analytics, no cookies,<br>no third-party requests.</sub></td>
   </tr>
 </table>
 
@@ -29,14 +29,26 @@
 </p>
 
 <p align="center">
+  <img alt="HTML5" src="https://img.shields.io/badge/HTML5-single%20file-e34f26?style=flat-square&logo=html5&logoColor=white&labelColor=1c1a3e">
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-vanilla-f7df1e?style=flat-square&logo=javascript&logoColor=f7df1e&labelColor=1c1a3e">
+  <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare&logoColor=f38020&labelColor=1c1a3e">
+  <img alt="Playwright" src="https://img.shields.io/badge/tested%20with-Playwright-2ead33?style=flat-square&logo=playwright&logoColor=2ead33&labelColor=1c1a3e">
+  <img alt="GitHub Actions" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088ff?style=flat-square&logo=githubactions&logoColor=2088ff&labelColor=1c1a3e">
+</p>
+
+<p align="center">
   <img src="docs/images/home.png" alt="The getClosr home screen: Map your desires. Privately., with buttons to fill out a list or paste a code" width="80%">
 </p>
 
 ## How it works
 
-1. Fill out your list. Rate each activity as No, Maybe, Yes or Crave, separately for doing it yourself, giving and receiving. It takes about 10 minutes, and you can switch off whole categories you don't want to think about today.
-2. Generate a code. Your answers are packed into one compact code. The code is your data; nothing is stored anywhere else.
-3. Compare. Paste the codes into the code field on the home screen. getClosr decodes them locally, shows what is inside, and then lists matches, things to talk about and gaps.
+<table>
+  <tr>
+    <td width="33%" valign="top"><img src="docs/images/glyphs/fill.svg" width="32" alt=""><br><b>1. Fill out your list</b><br>Rate each activity as No, Maybe, Yes or Crave, separately for doing it yourself, giving and receiving. It takes about 10 minutes, and you can switch off whole categories you don't want to think about today.</td>
+    <td width="33%" valign="top"><img src="docs/images/glyphs/code.svg" width="32" alt=""><br><b>2. Generate a code</b><br>Your answers are packed into one compact code. The code is your data; nothing is stored anywhere else.</td>
+    <td width="33%" valign="top"><img src="docs/images/glyphs/compare.svg" width="32" alt=""><br><b>3. Compare</b><br>Paste the codes into the code field on the home screen. getClosr decodes them locally, shows what is inside, and then lists matches, things to talk about and gaps.</td>
+  </tr>
+</table>
 
 A comparison takes any number of people. With three or more, getClosr shows what everyone shares as well as each compatible pair, and never invents combinations that nobody chose.
 
@@ -77,6 +89,70 @@ There is one opt-in exception: the *Send feedback* switch at the bottom of the p
 The widget talks to this site's own `/fk` path, which the Cloudflare Worker in [`src/worker.js`](src/worker.js) relays to the [FeedbackKit](https://github.com/TruffleCraft/feedbackkit) gateway. An AI model reads the message once to understand it and, if something is missing, asks one follow-up question. Feedback is stored in a private inbox and is **not** published as a GitHub issue; the maintainers turn it into issues by hand. Cloudflare Turnstile runs as a bot check, and only after the switch is on.
 
 The full privacy policy is at [getclosr.link/privacy](https://getclosr.link/privacy).
+
+## Reporting a problem
+
+Found a bug, something confusing, or an idea? The quickest way is the feedback form built into the app. You don't need a GitHub account.
+
+1. Open [getclosr.link](https://getclosr.link) and scroll to the bottom of the home screen.
+2. Turn on the **Send feedback** switch. A small *Feedback* button now stays in the corner of every screen.
+3. Go to the screen where the problem happens, tap *Feedback*, choose **Something broke** or **Idea**, and describe it in your own words. You can attach a screenshot you took yourself.
+4. If something important is missing, the form asks **one** short follow-up question. Then you're done.
+
+What gets sent, and what doesn't:
+
+- **Sent:** your message, images you attach, the page address (without any code), browser type and screen size.
+- **Never sent:** your list, your answers, your notes or any code.
+- Feedback lands in a private inbox and is **not** published. The maintainers turn it into public issues by hand, without personal details. [FeedbackKit](https://github.com/TruffleCraft/feedbackkit) handles the form; an AI model reads each message once to understand it.
+
+You can switch the form off again at any time; nothing loads while it is off.
+
+Prefer GitHub? Open a [bug report or idea](https://github.com/getclosr-link/getclosr/issues/new/choose), but please never paste a real code or real answers. Anything that could expose someone's answers goes through the private channel in [SECURITY.md](SECURITY.md).
+
+## Under the hood
+
+getClosr is deliberately small. The whole app is one HTML file that runs in the browser; the only server-side code is a small Worker that serves that file and relays the opt-in feedback form.
+
+```mermaid
+flowchart LR
+  subgraph device["Your device"]
+    app["getClosr<br/>public/index.html"]
+    store[("localStorage<br/>draft and saved comparisons")]
+    app <--> store
+  end
+  subgraph cf["Cloudflare"]
+    worker["Worker<br/>src/worker.js"]
+    assets["Static assets<br/>public/"]
+    worker --> assets
+  end
+  app -- "page load only" --> worker
+  app -. "code you share yourself<br/>(text, link or QR)" .-> other["Another person's device"]
+  app -. "only if the feedback switch is on" .-> fk["/fk relay"]
+  fk -.-> gateway["FeedbackKit gateway<br/>private inbox + AI follow-up"]
+  worker --- fk
+```
+
+| Part | What it does | Where |
+|---|---|---|
+| App | Checklist, encoder and decoder for codes, comparisons, share cards and QR codes. Plain HTML, CSS and JavaScript, no framework, no build step. | [`public/index.html`](public/index.html) |
+| Storage | Your draft and saved comparisons stay in the browser's `localStorage`. Nothing is uploaded. | your browser |
+| Codes | Answers are packed into a compact binary code (private v6, group v7, older v2 to v4 still open). Sharing means handing over that code yourself. | [`tests/specs/codec.spec.js`](tests/specs/codec.spec.js) |
+| Worker | Serves `public/` as static assets with clean URLs, the `404.html` page and the headers from `_headers`. Only `/fk/*` runs code. | [`src/worker.js`](src/worker.js), [`wrangler.jsonc`](wrangler.jsonc) |
+| Feedback | Off by default. The switch loads the [FeedbackKit](https://github.com/TruffleCraft/feedbackkit) widget from the site's own `/fk` path; messages land in a private inbox. | [`feedbackkit.config.json`](feedbackkit.config.json) |
+| Tests | Playwright end-to-end specs in Chromium and WebKit, run on every pull request. | [`tests/`](tests) |
+| Releases | A tag `vX.Y.Z` publishes a GitHub release from [`CHANGELOG.md`](CHANGELOG.md). | [`.github/workflows/release.yml`](.github/workflows/release.yml) |
+
+### Repository layout
+
+```text
+public/            the site: index.html (the app), imprint, privacy, 404, _headers, robots.txt
+src/worker.js      Cloudflare Worker: static assets plus the /fk feedback relay
+wrangler.jsonc     Worker configuration (assets, custom domain getclosr.link)
+tests/             Playwright specs and config
+docs/              design, brand and share-card rules, README images
+feedbackkit.config.json   feedback form: types, AI follow-up, private storage
+CHANGELOG.md       release notes, one section per version
+```
 
 ## Local development
 

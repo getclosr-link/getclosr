@@ -3,6 +3,6 @@ contact_links:
   - name: Security or privacy problem
     url: https://github.com/getclosr-link/getclosr/blob/main/SECURITY.md
     about: Please report anything that could expose someone's answers privately, not in a public issue.
-  - name: Feedback about the app
+  - name: Report a problem in the app (no GitHub account needed)
     url: https://getclosr.link
-    about: Use the "Send feedback" button at the bottom of the page.
+    about: Turn on the "Send feedback" switch at the bottom of the home screen. No GitHub account needed, and it stays private.
