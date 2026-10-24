@@ -1,18 +1,41 @@
-# getClosr
+<p align="center">
+  <a href="https://getclosr.link"><img src="docs/images/banner.png" alt="getClosr — Map your desires. Privately. No account, no server, no tracking." width="100%"></a>
+</p>
 
-[![tests](https://github.com/getclosr-link/getclosr/actions/workflows/tests.yml/badge.svg)](https://github.com/getclosr-link/getclosr/actions/workflows/tests.yml)
+<p align="center">
+  <a href="https://getclosr.link"><img alt="Live at getclosr.link" src="https://img.shields.io/badge/live-getclosr.link-ff9398?style=flat-square&labelColor=1c1a3e"></a>
+  <a href="https://github.com/getclosr-link/getclosr/actions/workflows/tests.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/getclosr-link/getclosr/tests.yml?branch=main&style=flat-square&label=tests&labelColor=1c1a3e"></a>
+  <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/code-AGPL--3.0-7a0f35?style=flat-square&labelColor=1c1a3e"></a>
+  <a href="LICENSE-CONTENT.md"><img alt="Content: CC BY-SA 4.0" src="https://img.shields.io/badge/content-CC%20BY--SA%204.0-d14836?style=flat-square&labelColor=1c1a3e"></a>
+  <img alt="No build step" src="https://img.shields.io/badge/build-none-37346a?style=flat-square&labelColor=1c1a3e">
+</p>
 
-A free, private desires checklist for yourself, a partner, a date or a group. Each person fills out the list on their own device. Keep it for yourself, or share a code and the app shows what you want together. There is no account and no server: your answers stay in your browser until you decide to hand over a code.
+<p align="center">
+  <b>A free desires checklist for yourself, a partner, a date or a group.</b><br>
+  Fill it out on your own device, keep it for yourself, or share a code and see what you want together.
+</p>
 
-Try it at **[getclosr.link](https://getclosr.link)**.
+<table align="center">
+  <tr>
+    <td align="center" width="33%"><b>No account</b><br><sub>No sign-up, no login, no email.</sub></td>
+    <td align="center" width="33%"><b>No server</b><br><sub>Your answers stay in your browser. The code <i>is</i> your data.</sub></td>
+    <td align="center" width="33%"><b>No tracking</b><br><sub>No analytics, no cookies, no third-party requests.</sub></td>
+  </tr>
+</table>
 
-![The getClosr home screen: "Map your desires. Privately.", with buttons to fill out a list or paste a code](docs/images/home.png)
+<p align="center">
+  <a href="https://getclosr.link"><b>Open getClosr →</b></a>
+</p>
+
+<p align="center">
+  <img src="docs/images/home.png" alt="The getClosr home screen: Map your desires. Privately., with buttons to fill out a list or paste a code" width="80%">
+</p>
 
 ## How it works
 
 1. Fill out your list. Rate each activity as No, Maybe, Yes or Crave, separately for doing it yourself, giving and receiving. It takes about 10 minutes, and you can switch off whole categories you don't want to think about today.
 2. Generate a code. Your answers are packed into one compact code. The code is your data; nothing is stored anywhere else.
-3. Compare. Paste each other's codes into the code field on the home screen. getClosr decodes them locally, shows what is inside, and then lists matches, things to talk about and gaps.
+3. Compare. Paste the codes into the code field on the home screen. getClosr decodes them locally, shows what is inside, and then lists matches, things to talk about and gaps.
 
 A comparison takes any number of people. With three or more, getClosr shows what everyone shares as well as each compatible pair, and never invents combinations that nobody chose.
 
@@ -48,7 +71,9 @@ Older v2 to v4 codes still open. Replacing your own list with an imported one is
 
 getClosr is one static HTML page. It has no backend, no database, no analytics, no cookies and no tracking. All processing happens in your browser, and we could not see your answers even if we wanted to.
 
-There is one opt-in exception: the *Send feedback* button at the bottom of the page. Nothing loads until you click it. Then a small form opens, and only what you send leaves the browser: your message, the page address without query or code, your browser type and screen size. It never includes a screenshot, your answers or a code. The form talks to this site's own `/fk` path, which the Cloudflare Worker in `src/worker.js` relays to the feedback gateway set in the `FEEDBACKKIT_ORIGIN` secret. Without that variable the form does not load at all. The open form also runs Cloudflare Turnstile as a bot check, the only request to a third party, and only after the click.
+There is one opt-in exception: the *Send feedback* switch at the bottom of the page. Nothing loads until you turn it on. It then pins a small feedback button to the corner, so you can report something from any screen. Only what you send leaves the browser: your message, any image you attach yourself, the page address without query or code, your browser type and screen size. It never takes a screenshot on its own and never includes your answers or a code.
+
+The widget talks to this site's own `/fk` path, which the Cloudflare Worker in [`src/worker.js`](src/worker.js) relays to the [FeedbackKit](https://github.com/TruffleCraft/feedbackkit) gateway. An AI model reads the message once to understand it and, if something is missing, asks one follow-up question. Feedback is stored in a private inbox and is **not** published as a GitHub issue; the maintainers turn it into issues by hand. Cloudflare Turnstile runs as a bot check, and only after the switch is on.
 
 The full privacy policy is at [getclosr.link/privacy](https://getclosr.link/privacy).
 
