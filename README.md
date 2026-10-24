@@ -16,6 +16,10 @@
   Fill it out on your own device, keep it for yourself, or share a code and see what you want together.
 </p>
 
+<p align="center">
+  <a href="https://getclosr.link"><img alt="Open getClosr" src="https://img.shields.io/badge/Open_getClosr-%E2%86%92-ff9398?style=for-the-badge&labelColor=7a0f35"></a>
+</p>
+
 <table align="center">
   <tr>
     <td align="center" width="33%"><img src="docs/images/glyphs/no-account.svg" width="40" alt=""><br><b>No account</b><br><sub>No sign-up, no login, no email.</sub></td>
@@ -23,18 +27,6 @@
     <td align="center" width="33%"><img src="docs/images/glyphs/no-tracking.svg" width="40" alt=""><br><b>No tracking</b><br><sub>No analytics, no cookies,<br>no third-party requests.</sub></td>
   </tr>
 </table>
-
-<p align="center">
-  <a href="https://getclosr.link"><b>Open getClosr →</b></a>
-</p>
-
-<p align="center">
-  <img alt="HTML5" src="https://img.shields.io/badge/HTML5-single%20file-e34f26?style=flat-square&logo=html5&logoColor=white&labelColor=1c1a3e">
-  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-vanilla-f7df1e?style=flat-square&logo=javascript&logoColor=f7df1e&labelColor=1c1a3e">
-  <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare&logoColor=f38020&labelColor=1c1a3e">
-  <img alt="Playwright" src="https://img.shields.io/badge/tested%20with-Playwright-2ead33?style=flat-square&logo=playwright&logoColor=2ead33&labelColor=1c1a3e">
-  <img alt="GitHub Actions" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088ff?style=flat-square&logo=githubactions&logoColor=2088ff&labelColor=1c1a3e">
-</p>
 
 ## How it works
 
@@ -106,6 +98,14 @@ You can switch the form off again at any time; nothing loads while it is off.
 Prefer GitHub? Open a [bug report or idea](https://github.com/getclosr-link/getclosr/issues/new/choose), but please never paste a real code or real answers. Anything that could expose someone's answers goes through the private channel in [SECURITY.md](SECURITY.md).
 
 ## Under the hood
+
+<p>
+  <img alt="HTML5" src="https://img.shields.io/badge/HTML5-single%20file-e34f26?style=flat-square&logo=html5&logoColor=white&labelColor=1c1a3e">
+  <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-vanilla-f7df1e?style=flat-square&logo=javascript&logoColor=f7df1e&labelColor=1c1a3e">
+  <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Workers-f38020?style=flat-square&logo=cloudflare&logoColor=f38020&labelColor=1c1a3e">
+  <img alt="Playwright" src="https://img.shields.io/badge/tested%20with-Playwright-2ead33?style=flat-square&logo=playwright&logoColor=2ead33&labelColor=1c1a3e">
+  <img alt="GitHub Actions" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088ff?style=flat-square&logo=githubactions&logoColor=2088ff&labelColor=1c1a3e">
+</p>
 
 getClosr is deliberately small. The whole app is one HTML file that runs in the browser; the only server-side code is a small Worker that serves that file and relays the opt-in feedback form.
 
