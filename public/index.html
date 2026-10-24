@@ -4865,8 +4865,10 @@ function goToCode() {
 }
 
 async function shareCode() {
-  const code = document.getElementById('my-code-display').textContent;
-  if (!navigator.share) { copyCode(); return; }
+  const result = shareCodeResult('code');
+  if (result.status !== 'ready') return;
+  const code = result.code;
+  if (!navigator.share) { copyCode(code); return; }
   try {
     await navigator.share({ title: 'My GetClosr code', text: code });
   } catch (e) { /* user cancelled */ }
@@ -5293,7 +5295,7 @@ const SHARE_TABS = {
       ['warn', 'Anyone holding this code holds your complete list.'],
     ],
     primary: 'Copy',
-    run: () => copyCode(currentPrivateCode()),
+    run: () => copyShareCode('code'),
   },
   groupcode: {
     label: 'Group code',
@@ -5306,9 +5308,9 @@ const SHARE_TABS = {
       ['warn', 'Anyone holding this code holds all of these lists. Share it only with the people in it.'],
     ],
     primary: 'Copy',
-    available: () => !!currentGroupCode(),
+    available: () => shareSources('groupcode').length >= 2 && shareSources('groupcode').every(Boolean),
     unavailable: 'Compare at least two profiles first.',
-    run: () => copyCode(currentGroupCode()),
+    run: () => copyShareCode('groupcode'),
   },
 };
 
@@ -5319,15 +5321,26 @@ function comparisonSize() {
 // Built from the codes the comparison was started with, not from currentComparison:
 // those profiles are normalised for display and have lost the overall notes. Local
 // nicknames stay on this device, so each profile keeps the name its owner chose.
-function currentGroupCode() {
-  const profiles = shareSources('groupcode');
-  if (profiles.length < 2 || profiles.some(p => !p)) return '';
-  const parts = shareParts('groupcode');
-  try { return encodeGroup(profiles.map(p => withShareParts(p, parts))); } catch (e) { return ''; }
+function shareCodeResult(key) {
+  const profiles = shareSources(key);
+  if (!profiles.length || (key === 'groupcode' && profiles.length < 2)) return { status: 'empty', code: '', message: '' };
+  if (profiles.some(p => !p)) return { status: 'invalid', code: '', message: 'A list could not be read. Paste the original code again.' };
+  try {
+    const selected = profiles.map(p => withShareParts(p, shareParts(key)));
+    const code = key === 'groupcode' ? encodeGroup(selected) : encode(selected[0]);
+    return { status: 'ready', code, message: '' };
+  } catch (e) {
+    return { status: e instanceof RangeError ? 'too-large' : 'invalid', code: '', message: e.message || 'That code could not be prepared.' };
+  }
 }
 
-function currentPrivateCode() {
-  try { return encode(withShareParts(state, shareParts('code'))); } catch (e) { return ''; }
+function currentGroupCode() { return shareCodeResult('groupcode').code; }
+function currentPrivateCode() { return shareCodeResult('code').code; }
+
+function copyShareCode(key) {
+  const result = shareCodeResult(key);
+  if (result.status !== 'ready') throw new Error(result.message || 'That code is not ready to share.');
+  return copyCode(result.code);
 }
 
 // What goes into a private or group code is chosen each time the sheet opens. Ratings
@@ -5446,15 +5459,16 @@ function renderShareSheet() {
   const body = document.getElementById('share-sheet-body');
   if (!body) return;
   // The sheet also opens from the results screen, before the code screen ever ran; build
-  // the private code here so that row is never an empty box. No ratings, no row.
-  if (countRated() > 0) { try { state.myCode = encode(state); } catch (e) { /* hard limit too long: row hidden */ } }
+  // the private row whenever there are ratings, including when its code needs reducing.
+  const hasOwnRatings = countRated() > 0;
   const text = v => (typeof v === 'function' ? v() : v);
   const row = key => {
     const spec = SHARE_TABS[key];
     if (spec.available && !spec.available()) return '';
-    if (key === 'code' && !state.myCode) return '';
+    if (key === 'code' && !hasOwnRatings) return '';
     const open = key === shareTab && spec.privacy === 'private';
-    const code = key === 'code' ? currentPrivateCode() : key === 'groupcode' ? currentGroupCode() : '';
+    const result = spec.privacy === 'private' ? shareCodeResult(key) : { status: 'empty', code: '', message: '' };
+    const code = result.code;
     return `
       <div class="share-opt${open ? ' open' : ''}">
         <button type="button" class="share-opt-head" id="share-tab-${key}" aria-expanded="${open}" onclick="pickShareOption('${key}')">
@@ -5465,9 +5479,10 @@ function renderShareSheet() {
           ${sharePartsHtml(key)}
           <div class="code-display" id="${key === 'code' ? 'my-code-display' : 'group-code-display'}">${escapeHtml(code)}</div>
           <div class="share-opt-warn" id="share-parts-warn">${escapeHtml(sharePartsWarning(key))}</div>
+          ${result.message ? `<p class="err-msg show" role="status">${escapeHtml(result.message)}</p>` : ''}
           <div class="share-opt-actions">
-            <button type="button" class="btn btn-primary" id="share-sheet-primary" onclick="runShareAction()">Copy</button>
-            ${key === 'code' && navigator.share ? '<button type="button" class="btn btn-secondary" onclick="shareCode()">Send via app</button>' : ''}
+            <button type="button" class="btn btn-primary" id="share-sheet-primary" ${result.status !== 'ready' ? 'disabled' : ''} onclick="runShareAction()">Copy</button>
+            ${key === 'code' && navigator.share ? `<button type="button" class="btn btn-secondary" ${result.status !== 'ready' ? 'disabled' : ''} onclick="shareCode()">Send via app</button>` : ''}
           </div></div>` : ''}
       </div>`;
   };
@@ -5990,9 +6005,11 @@ function readProfileBody(buf, cursor, need) {
 
 function codeFromPayload(version, payload) {
   const packed = fflate.deflateSync(Uint8Array.from(payload), { level: 9 });
-  return packed.length < payload.length
+  const code = packed.length < payload.length
     ? codeFromBytes([version, FLAG_DEFLATED, ...packed])
     : codeFromBytes([version, 0, ...payload]);
+  if (code.length > MAX_CODE_CHARS) throw new RangeError('This code is too long to share. Leave out comments or notes and try again.');
+  return code;
 }
 
 function payloadFromBytes(buf) {

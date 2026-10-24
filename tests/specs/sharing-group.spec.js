@@ -265,3 +265,23 @@ test('own-code edit handles a draft removed after preview without saving an empt
   await expect(page.locator('#home-code-preview')).toContainText('saved list is no longer available');
   expect(await page.evaluate(() => loadDraft())).toBeNull();
 });
+
+// Value: protects=recovery from oversized group exports; fails_when=invalid code is copyable or row vanishes;
+// why_new=codec rejection alone does not verify the share UI; seam=none; no_claim=OS clipboard integration.
+test('oversized group stays in the share sheet and content switches recover a readable code', async ({ page }) => {
+  const { largeProfiles, compareCodes } = require('./helpers');
+  const profiles = largeProfiles(await page.evaluate(() => profileActivityIds()));
+  const codes = await page.evaluate(ps => ps.map(encode), profiles);
+  await compareCodes(page, ...codes);
+  await page.evaluate(() => openShareSheet('groupcode'));
+  await expect(page.locator('#share-tab-groupcode')).toBeVisible();
+  await expect(page.locator('#share-sheet')).toContainText('too long to share');
+  await expect(page.locator('#share-sheet-primary')).toBeDisabled();
+  await page.click('#share-part-groupcode-notes');
+  await page.click('#share-part-groupcode-overall');
+  await expect(page.locator('#share-sheet-primary')).toBeEnabled();
+  const exported = await page.locator('#group-code-display').innerText();
+  expect(await page.evaluate(c => decodeGroup(c).map(p => ({ name: p.name, notes: Object.values(p.ratings).map(rt => rt.n), overall: p.overallNote })), exported))
+    .toEqual(profiles.map(p => ({ name: p.name, notes: Object.keys(p.ratings).map(() => ''), overall: '' })));
+  expect(await page.evaluate(() => currentComparisonInputs.map(p => p.code))).toEqual(codes);
+});

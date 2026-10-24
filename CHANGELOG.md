@@ -15,6 +15,8 @@ to `main`; a release marks a tested state worth naming.
 
 ### Fixed
 
+- Oversized private and group exports explain how to reduce the code before copying it.
+
 - Editing your own code after a reload retains your saved answers and aftercare sharing choice.
 - A failed comparison save keeps the form open and reports the storage error so you can retry.
 
