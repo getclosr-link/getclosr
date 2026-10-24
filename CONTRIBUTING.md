@@ -44,6 +44,23 @@ People keep their codes in notes and chats for months. A change to the encoder m
 
 For larger UI changes, open an issue with a mock-up first. The design rules are in `docs/DESIGN.md` and `docs/BRAND.md`.
 
+A change that people will notice gets a line under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md).
+
+## Releases
+
+The site deploys on every push to `main`. A release names a tested state, following [Semantic Versioning](https://semver.org/) as described at the top of the changelog. Maintainers cut one like this:
+
+1. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`, add a fresh empty `## [Unreleased]` above it and update the compare links at the bottom.
+2. In `public/index.html`, set the footer link `#app-version` to `vX.Y.Z` (text and release URL).
+3. Commit to `main`, wait for the tests to pass, then tag and push:
+
+   ```bash
+   git tag -a vX.Y.Z -m "getClosr vX.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+The release workflow checks that the tag is on `main` and that the footer shows the same version, then publishes the GitHub release with that version's changelog section as notes.
+
 ## Reporting bugs and ideas
 
 Use the issue templates. For anything that could expose someone's answers, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.

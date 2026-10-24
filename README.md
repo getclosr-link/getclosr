@@ -7,6 +7,7 @@
   <a href="https://github.com/getclosr-link/getclosr/actions/workflows/tests.yml"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/getclosr-link/getclosr/tests.yml?branch=main&style=flat-square&label=tests&labelColor=1c1a3e"></a>
   <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/code-AGPL--3.0-7a0f35?style=flat-square&labelColor=1c1a3e"></a>
   <a href="LICENSE-CONTENT.md"><img alt="Content: CC BY-SA 4.0" src="https://img.shields.io/badge/content-CC%20BY--SA%204.0-d14836?style=flat-square&labelColor=1c1a3e"></a>
+  <a href="https://github.com/getclosr-link/getclosr/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/getclosr-link/getclosr?style=flat-square&labelColor=1c1a3e&color=ff9398"></a>
   <img alt="No build step" src="https://img.shields.io/badge/build-none-37346a?style=flat-square&labelColor=1c1a3e">
 </p>
 
@@ -121,6 +122,10 @@ Check a deploy against the live domain rather than the build log, for example by
 curl -sL https://getclosr.link/ | wc -c
 wc -c public/index.html
 ```
+
+## Releases
+
+Every version is tagged and published under [Releases](https://github.com/getclosr-link/getclosr/releases); what changed is in [CHANGELOG.md](CHANGELOG.md). The version also shows in the site footer.
 
 ## Contributing
 
