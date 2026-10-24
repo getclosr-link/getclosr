@@ -257,3 +257,27 @@ test.describe('results drill-down', () => {
     expect(await page.evaluate(() => [resultsTab, resultsScopeCat !== null])).toEqual(['list', true]);
   });
 });
+
+// Value: protects=aftercare sharing choice after hydration; fails_when=opt-in is dropped or inferred;
+// why_new=codec tests bypass draft loading; seam=none; no_claim=external recipient behavior.
+for (const path of ['resume', 'home comparison']) {
+  for (const preference of [true, false, undefined]) {
+    test(`draft hydration retains aftercare opt-in: ${path}, ${String(preference)}`, async ({ page }) => {
+      const exported = await page.evaluate(({ path, preference }) => {
+        const draft = { name: 'Alex', ratings: { 3: { s: 3, g: 0, r: 0, n: 'Synthetic note' } },
+          overallNote: 'Synthetic overall note', hardLimits: 'Synthetic boundary', aftercare: ['Water'],
+          completedAt: 12345, activeCatId: 'affection' };
+        if (preference !== undefined) draft.aftercareInCode = preference;
+        localStorage.setItem('closr.draft.v1', JSON.stringify(draft));
+        if (path === 'resume') resumeDraft(); else loadDraftIntoState();
+        saveDraft();
+        return { saved: loadDraft(), private: decode(encode(state)), public: decode(encodeProfile(state)) };
+      }, { path, preference });
+      expect(exported.saved).toMatchObject({ name: 'Alex', completedAt: 12345, aftercareInCode: preference === true });
+      for (const profile of [exported.private, exported.public]) {
+        expect(profile.aftercare).toEqual(preference === true ? ['Water'] : []);
+      }
+      expect(exported.saved.ratings[3].n).toBe('Synthetic note');
+    });
+  }
+}

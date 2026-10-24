@@ -13,6 +13,11 @@ to `main`; a release marks a tested state worth naming.
 
 ## [Unreleased]
 
+### Fixed
+
+- Editing your own code after a reload retains your saved answers and aftercare sharing choice.
+- A failed comparison save keeps the form open and reports the storage error so you can retry.
+
 ## [1.0.0] - 2026-10-24
 
 The first public release, on its own domain and under its own organization.

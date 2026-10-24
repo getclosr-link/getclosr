@@ -4407,6 +4407,7 @@ function loadDraftIntoState() {
   state = {
     name: draft.name || '', ratings: draft.ratings || {}, overallNote: draft.overallNote || '',
     hardLimits: draft.hardLimits || '', aftercare: Array.isArray(draft.aftercare) ? draft.aftercare : [],
+    aftercareInCode: !!draft.aftercareInCode,
     completedAt: draft.completedAt || null, activeCatId: draft.activeCatId || null,
   };
   return true;
@@ -4541,7 +4542,7 @@ function previewHomeCode(opts = {}) {
       <div class="code-card-meta">${same ? 'Same as the list on this device' : meta}</div>
     </div>`;
     host.innerHTML = same
-      ? `${card}<button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="clearPendingCode();buildReviewScreen();go('review')">Edit my list</button>`
+      ? `${card}<button type="button" class="btn btn-secondary" style="margin-top:12px" onclick="editOwnList()">Edit my list</button>`
       : pendingCode.theirs
       ? `${card}
     <input id="home-nick" class="home-nick" type="text" maxlength="40" placeholder="Nickname on this device (optional)" aria-label="Local nickname">
@@ -4769,18 +4770,19 @@ function timeAgo(ts) {
   return Math.floor(s/86400) + 'd ago';
 }
 
+function editOwnList() {
+  if (!loadDraftIntoState()) {
+    const preview = document.getElementById('home-code-preview');
+    if (preview) preview.innerHTML = '<p class="err-msg show" role="status">Your saved list is no longer available. Paste your code again to restore it.</p>';
+    return;
+  }
+  clearPendingCode();
+  buildReviewScreen();
+  go('review');
+}
+
 function resumeDraft() {
-  const draft = loadDraft();
-  if (!draft) return;
-  state = {
-    name: draft.name || '',
-    ratings: draft.ratings || {},
-    overallNote: draft.overallNote || '',
-    hardLimits: draft.hardLimits || '',
-    aftercare: Array.isArray(draft.aftercare) ? draft.aftercare : [],
-    completedAt: draft.completedAt || null,
-    activeCatId: draft.activeCatId || null,
-  };
+  if (!loadDraftIntoState()) return;
   buildFillScreen();
   go('fill');
 }
@@ -6801,8 +6803,7 @@ function saveConstellation(name, people) {
   const list = loadConstellations();
   list.push({ id: Date.now(), name: String(name || '').trim(), savedAt: Date.now(), people });
   while (list.length > COMPARE_SAVED_MAX) list.shift();
-  LS.set(COMPARE_SAVED_KEY, JSON.stringify(list));
-  return list;
+  return LS.set(COMPARE_SAVED_KEY, JSON.stringify(list));
 }
 
 function deleteConstellation(id) {
@@ -6833,7 +6834,18 @@ function promptSaveConstellation() {
 function confirmSaveConstellation() {
   if (!currentComparisonInputs || currentComparisonInputs.length < 2) return;
   const name = (document.getElementById('save-const-name')?.value || '').trim();
-  saveConstellation(name, currentComparisonInputs);
+  if (!saveConstellation(name, currentComparisonInputs)) {
+    const form = document.querySelector('#res-save-constellation form');
+    let status = form && form.querySelector('[role="status"]');
+    if (form && !status) {
+      status = document.createElement('p');
+      status.className = 'err-msg show';
+      status.setAttribute('role', 'status');
+      form.appendChild(status);
+    }
+    if (status) status.textContent = 'Not saved: browser storage is unavailable. Keep this page open and try again.';
+    return;
+  }
   renderSavedConstellations();
   const host = document.getElementById('res-save-constellation');
   if (host) host.innerHTML = '<div class="saved-const-ok" role="status"><b>✓ Saved on this phone</b><span>Open it again from the start page, under Saved comparisons.</span></div>';
