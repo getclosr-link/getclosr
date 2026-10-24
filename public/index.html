@@ -1406,6 +1406,7 @@ body.sheet-open { overflow: hidden; }
       <div class="l-footer-actions">
         <a class="bmc-link" href="https://buymeacoffee.com/madsbergstroem" target="_blank" rel="noopener noreferrer" onclick="openCoffeeSheet(this);return false;"><span class="btn-ico" data-ico="coffee"></span> Buy me a coffee</a>
         <button type="button" class="bmc-link fk-switch" id="feedback-toggle" role="switch" aria-checked="false" onclick="feedbackToggle()"><span>Send feedback</span><span class="fk-switch-track" aria-hidden="true"></span></button>
+        <span id="feedback-status" role="status"></span>
       </div>
       <p class="l-footer-fk-note" id="feedback-note">Nothing loads until you switch this on. It then pins a small feedback button to the corner so you can report something from any screen (runs Cloudflare's bot check; your list and codes are never sent).</p>
       <div class="l-footer-base">
@@ -7458,15 +7459,30 @@ function feedbackToggle(force) {
     }
     return;
   }
+  document.getElementById('feedback-status').textContent = '';
   if (host) host.style.display = '';
   if (window.FeedbackKit) return window.FeedbackKit.open();
-  if (document.querySelector('script[data-fk-loader]')) return; // still loading, it opens itself
+  if (document.querySelector('script[data-fk-loader]')) return;
   const s = document.createElement('script');
   s.src = '/fk/widget.js';
   s.dataset.project = 'fk_pub_3c8e51a07d2b';
   s.dataset.base = '/fk';
-  s.dataset.autoopen = '';
   s.setAttribute('data-fk-loader', '');
+  const isCurrent = () => document.querySelector('script[data-fk-loader]') === s;
+  s.onerror = () => {
+    if (!isCurrent()) return;
+    s.remove();
+    btn.setAttribute('aria-checked', 'false');
+    document.getElementById('feedback-status').textContent = 'Feedback could not load. Turn the switch on to try again.';
+  };
+  s.onload = () => {
+    if (!isCurrent()) return;
+    if (!window.FeedbackKit) { s.onerror(); return; }
+    const enabled = btn.getAttribute('aria-checked') === 'true';
+    const loadedHost = document.querySelector('[data-feedbackkit="host"]');
+    if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
+    if (enabled) window.FeedbackKit.open();
+  };
   document.body.appendChild(s);
 }
 const feedbackOpen = () => feedbackToggle(true);

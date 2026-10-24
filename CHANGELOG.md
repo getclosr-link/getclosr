@@ -15,6 +15,8 @@ to `main`; a release marks a tested state worth naming.
 
 ### Fixed
 
+- A failed feedback load can be retried, and switching feedback off prevents a delayed load from opening it.
+
 - Category choices, result filters and activity details work from the keyboard. Dialogs contain focus and return it when closed.
 
 - The privacy notice distinguishes discarding a draft from clearing all site data.
