@@ -15,7 +15,7 @@ module.exports = defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      testMatch: /(sharing-group|profile-card|group-card)\.spec\.js/,
+      testMatch: /(sharing-group|profile-card|group-card|accessibility)\.spec\.js/,
     },
   ],
   webServer: {
