@@ -299,3 +299,22 @@ test.describe('matchStatus bucketing', () => {
     });
   }
 });
+
+// Value: protects=reopenable group exports; fails_when=an encoder returns a rejected oversized code;
+// why_new=existing group fixtures compress well; seam=none; no_claim=oversized code support.
+test('group export rejects the smallest oversized valid fixture and still accepts reduced content', async ({ page }) => {
+  const { largeProfiles } = require('./helpers');
+  const profiles = largeProfiles(await page.evaluate(() => profileActivityIds()));
+  const result = await page.evaluate(ps => {
+    const individual = ps.map(p => decode(encode(p)) !== null);
+    let message = '';
+    try { encodeGroup(ps); } catch (e) { message = e.message; }
+    const reduced = ps.map(p => ({ ...p, ratings: Object.fromEntries(Object.entries(p.ratings).map(([id, rt]) => [id, { ...rt, n: '' }])), overallNote: '' }));
+    const code = encodeGroup(reduced);
+    return { individual, message, length: code.length, profiles: decodeGroup(code).length };
+  }, profiles);
+  expect(result.individual).toEqual([true, true]);
+  expect(result.message).toContain('too long to share');
+  expect(result.length).toBeLessThanOrEqual(8000);
+  expect(result.profiles).toBe(2);
+});

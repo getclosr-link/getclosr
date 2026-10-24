@@ -35,7 +35,8 @@ test('nothing loads before the switch is turned on; turning it on pins the float
   await sw.click();
   await expect(sw).toHaveAttribute('aria-checked', 'true');
   await expect.poll(() => page.evaluate(() => window.__fk && window.__fk.opens)).toBe(1);
-  expect(await page.evaluate(() => window.__fk)).toMatchObject({ base: '/fk', autoopen: '' });
+  expect(await page.evaluate(() => window.__fk)).toMatchObject({ base: '/fk' });
+  expect(await page.evaluate(() => window.__fk.autoopen)).toBeUndefined();
   expect(seen.some((u) => u.endsWith('/fk/widget.js'))).toBe(true);
   expect(seen.filter((u) => new URL(u).host !== ownHost)).toEqual([]);
 
@@ -51,4 +52,66 @@ test('nothing loads before the switch is turned on; turning it on pins the float
   await sw.click();
   await expect.poll(() => page.evaluate(() => window.__fk.opens)).toBe(2);
   expect(await page.locator('script[data-fk-loader]').count()).toBe(1);
+});
+
+// Value: protects=manual retry after network failure without background requests;
+// seam=failed then synthetic widget response; no_claim=upstream service availability.
+test('a failed feedback load resets the switch and a fresh opt-in retries once', async ({ page }) => {
+  let requests = 0;
+  await page.route('**/fk/widget.js', route => {
+    requests++;
+    return requests === 1 ? route.abort('failed') : route.fulfill({ status: 200, contentType: 'application/javascript', body: STUB });
+  });
+  await page.goto('/');
+  const sw = page.getByRole('switch', { name: 'Send feedback' });
+  await sw.click();
+  await expect(sw).toHaveAttribute('aria-checked', 'false');
+  await expect(page.locator('script[data-fk-loader]')).toHaveCount(0);
+  await expect(page.locator('#feedback-status')).toContainText('Feedback could not load');
+  await page.waitForTimeout(200);
+  expect(requests).toBe(1);
+  await sw.click();
+  await expect.poll(() => page.evaluate(() => window.__fk?.opens)).toBe(1);
+  expect(requests).toBe(2);
+  await expect(sw).toHaveAttribute('aria-checked', 'true');
+});
+
+test('switching off during a delayed feedback load prevents late opening', async ({ page }) => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  let requests = 0;
+  await page.route('**/fk/widget.js', async route => {
+    requests++; await gate;
+    await route.fulfill({ status: 200, contentType: 'application/javascript', body: STUB });
+  });
+  await page.goto('/');
+  const sw = page.getByRole('switch', { name: 'Send feedback' });
+  await sw.click();
+  await expect.poll(() => requests).toBe(1);
+  await sw.click();
+  release();
+  await expect.poll(() => page.evaluate(() => !!window.FeedbackKit)).toBe(true);
+  expect(await page.evaluate(() => window.__fk.opens)).toBe(0);
+  await expect(page.locator('[data-feedbackkit="host"]')).toBeHidden();
+  await sw.click();
+  await expect.poll(() => page.evaluate(() => window.__fk.opens)).toBe(1);
+  expect(requests).toBe(1);
+});
+
+test('off and on during one pending feedback load keeps a single request', async ({ page }) => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  let requests = 0;
+  await page.route('**/fk/widget.js', async route => {
+    requests++; await gate;
+    await route.fulfill({ status: 200, contentType: 'application/javascript', body: STUB });
+  });
+  await page.goto('/');
+  const sw = page.getByRole('switch', { name: 'Send feedback' });
+  await sw.click(); await expect.poll(() => requests).toBe(1);
+  await sw.click(); await sw.click();
+  release();
+  await expect.poll(() => page.evaluate(() => window.__fk?.opens)).toBe(1);
+  expect(requests).toBe(1);
+  await expect(page.locator('script[data-fk-loader]')).toHaveCount(1);
 });

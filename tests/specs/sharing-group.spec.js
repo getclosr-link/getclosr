@@ -226,6 +226,14 @@ test.describe('your own code', () => {
     await page.fill('#home-code-input', mine);
     await expect(page.locator('#home-code-preview .code-card-tag')).toHaveText('Your own list');
     await expect(page.locator('#home-code-preview')).toContainText('Same as the list on this device');
+    await page.reload();
+    await page.click('#home-code-toggle');
+    await page.fill('#home-code-input', mine);
+    await page.getByRole('button', { name: 'Edit my list', exact: true }).click();
+    await expect(page.locator('#review-title')).toContainText(robin.name);
+    await page.fill('#review-note', 'Updated synthetic note');
+    const saved = await page.evaluate(() => loadDraft());
+    expect(saved).toMatchObject({ ...robin, overallNote: 'Updated synthetic note' });
   });
 
   test('with a different list on the device, "Mine" warns and "Robin\'s" leads to comparing', async ({ page }) => {
@@ -238,4 +246,42 @@ test.describe('your own code', () => {
     await expect(page.locator('#home-nick')).toBeVisible();
     await expect(page.locator('#home-code-preview .btn-primary')).toHaveText('Compare with Robin →');
   });
+});
+
+// Value: protects=stored answers when the draft vanishes; fails_when=Edit opens an empty profile;
+// why_new=own-code happy path cannot cover missing storage; seam=none; no_claim=multi-tab timing.
+test('own-code edit handles a draft removed after preview without saving an empty list', async ({ page }) => {
+  const ownCode = await page.evaluate(() => {
+    state = { ...state, name: 'Alex', ratings: { 3: { s: 3, g: 0, r: 0, n: '' } } };
+    saveDraft();
+    return encode(state);
+  });
+  await page.reload();
+  await page.click('#home-code-toggle');
+  await page.fill('#home-code-input', ownCode);
+  await page.evaluate(() => localStorage.removeItem('closr.draft.v1'));
+  await page.getByRole('button', { name: 'Edit my list', exact: true }).click();
+  await expect(page.locator('#s-home')).toHaveClass(/on/);
+  await expect(page.locator('#home-code-preview')).toContainText('saved list is no longer available');
+  expect(await page.evaluate(() => loadDraft())).toBeNull();
+});
+
+// Value: protects=recovery from oversized group exports; fails_when=invalid code is copyable or row vanishes;
+// why_new=codec rejection alone does not verify the share UI; seam=none; no_claim=OS clipboard integration.
+test('oversized group stays in the share sheet and content switches recover a readable code', async ({ page }) => {
+  const { largeProfiles, compareCodes } = require('./helpers');
+  const profiles = largeProfiles(await page.evaluate(() => profileActivityIds()));
+  const codes = await page.evaluate(ps => ps.map(encode), profiles);
+  await compareCodes(page, ...codes);
+  await page.evaluate(() => openShareSheet('groupcode'));
+  await expect(page.locator('#share-tab-groupcode')).toBeVisible();
+  await expect(page.locator('#share-sheet')).toContainText('too long to share');
+  await expect(page.locator('#share-sheet-primary')).toBeDisabled();
+  await page.click('#share-part-groupcode-notes');
+  await page.click('#share-part-groupcode-overall');
+  await expect(page.locator('#share-sheet-primary')).toBeEnabled();
+  const exported = await page.locator('#group-code-display').innerText();
+  expect(await page.evaluate(c => decodeGroup(c).map(p => ({ name: p.name, notes: Object.values(p.ratings).map(rt => rt.n), overall: p.overallNote })), exported))
+    .toEqual(profiles.map(p => ({ name: p.name, notes: Object.keys(p.ratings).map(() => ''), overall: '' })));
+  expect(await page.evaluate(() => currentComparisonInputs.map(p => p.code))).toEqual(codes);
 });

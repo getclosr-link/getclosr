@@ -59,3 +59,19 @@ async function compareCodes(page, ...codes) {
 }
 
 module.exports = { craftCode, encodeInApp, decodeInApp, v2Bytes, compareCodes, queueCodes };
+
+// Distinct legal notes avoid the unusually good compression of repeated sample text.
+function largeProfiles(ids) {
+  let seed = 42;
+  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const text = n => Array.from({ length: n }, () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return alphabet[seed % alphabet.length];
+  }).join('');
+  return Array.from({ length: 2 }, (_, i) => ({
+    name: `Synthetic ${i + 1}`,
+    ratings: Object.fromEntries(ids.map(id => [id, { s: 3, g: 4, r: 2, n: text(60) }])),
+    aftercare: [], aftercareInCode: false, overallNote: text(300), hardLimits: '',
+  }));
+}
+module.exports.largeProfiles = largeProfiles;

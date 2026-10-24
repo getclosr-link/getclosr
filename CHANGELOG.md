@@ -13,6 +13,19 @@ to `main`; a release marks a tested state worth naming.
 
 ## [Unreleased]
 
+### Fixed
+
+- A failed feedback load can be retried, and switching feedback off prevents a delayed load from opening it.
+
+- Category choices, result filters and activity details work from the keyboard. Dialogs contain focus and return it when closed.
+
+- The privacy notice distinguishes discarding a draft from clearing all site data.
+
+- Oversized private and group exports explain how to reduce the code before copying it.
+
+- Editing your own code after a reload retains your saved answers and aftercare sharing choice.
+- A failed comparison save keeps the form open and reports the storage error so you can retry.
+
 ## [1.0.0] - 2026-10-24
 
 The first public release, on its own domain and under its own organization.
