@@ -5115,8 +5115,8 @@ function canvasKit(d) {
 // right. A fixed 300 px QR area keeps the cards at a fixed 3:4; the QR inside is drawn at
 // whole pixels per module, which still decodes for the longest legal profile.
 const CARD_QR_PANEL = { x: 1080 - 56 - 348, y: 1008, size: 348, qr: 300 };
-function drawCardQrPanel(kit, caps, url, caption, C) {
-  const { x, y, size, qr } = CARD_QR_PANEL;
+function drawCardQrPanel(kit, caps, url, caption, C, x = CARD_QR_PANEL.x) {
+  const { y, size, qr } = CARD_QR_PANEL;
   caps(caption, x, y - 18, 20, C.accent);
   kit.box(x, y, size, size, C.surface, C.rule, 22);
   const inset = (size - qr) / 2;
@@ -5197,14 +5197,17 @@ function buildProfileCard() {
   // Bottom row: hard limits left, QR panel right, both on the same caption line.
   const { y: rowTop, size: rowH } = CARD_QR_PANEL;
   const limitsW = CARD_QR_PANEL.x - 24 - PAD;
-  drawIcon('shield-check', PAD, rowTop - 42, 26, T[1].fg);
-  caps('HARD LIMITS', PAD + 36, rowTop - 18, 20, T[1].fg);
-  box(PAD, rowTop, limitsW, rowH, T[1].bg, T[1].br, 22);
-  const limits = String(state.hardLimits || '').trim() || 'No hard limits shared on this profile.';
-  let limitFont = sans(600, 22), lineH = 30, limitLines = splitLines(limits, limitFont, limitsW - 52);
-  if (limitLines.length > 9) { limitFont = sans(600, 18); lineH = 24; limitLines = splitLines(limits, limitFont, limitsW - 52); }
-  limitLines.slice(0, 12).forEach((line, i) => label(line, PAD + 26, rowTop + 46 + i * lineH, limitFont, C.ink));
-  const qrRect = drawCardQrPanel(kit, caps, qrUrl, 'SCAN TO COMPARE WITH ME', C);
+  const limits = String(state.hardLimits || '').trim();
+  if (limits) {
+    drawIcon('shield-check', PAD, rowTop - 42, 26, T[1].fg);
+    caps('HARD LIMITS', PAD + 36, rowTop - 18, 20, T[1].fg);
+    box(PAD, rowTop, limitsW, rowH, T[1].bg, T[1].br, 22);
+    let limitFont = sans(600, 22), lineH = 30, limitLines = splitLines(limits, limitFont, limitsW - 52);
+    if (limitLines.length > 9) { limitFont = sans(600, 18); lineH = 24; limitLines = splitLines(limits, limitFont, limitsW - 52); }
+    limitLines.slice(0, 12).forEach((line, i) => label(line, PAD + 26, rowTop + 46 + i * lineH, limitFont, C.ink));
+  }
+  const qrX = limits ? CARD_QR_PANEL.x : (W - CARD_QR_PANEL.size) / 2;
+  const qrRect = drawCardQrPanel(kit, caps, qrUrl, 'SCAN TO COMPARE WITH ME', C, qrX);
 
   d.strokeStyle = C.rule; d.lineWidth = 2; d.beginPath(); d.moveTo(PAD, H - 56); d.lineTo(W - PAD, H - 56); d.stroke();
   label('Compare with care · getclosr.link · no account, no server', PAD, H - 24, sans(600, 18), C.muted);
