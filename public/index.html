@@ -6391,7 +6391,7 @@ function buildFillScreen() {
   const list = document.getElementById('act-list');
 
   if (state.activeCatId === 'aftercare') {
-    list.innerHTML = buildAftercareCard(cats.length) + buildFillNavButtons(cats);
+    list.innerHTML = `<section class="q-stage">${buildAftercareCard(cats.length)}${buildFillNavButtons(cats)}</section>`;
     return;
   }
   const activeCat = cats.find(c => c.id === state.activeCatId) || cats[0];

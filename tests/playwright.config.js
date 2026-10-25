@@ -11,11 +11,11 @@ module.exports = defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    // Sharing runs through Web Share, clipboard and canvas export, where Safari behaves differently.
+    // Sharing, keyboard interactions and questionnaire layout also run in Safari’s engine.
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-      testMatch: /(sharing-group|profile-card|group-card|accessibility)\.spec\.js/,
+      testMatch: /(sharing-group|profile-card|group-card|accessibility|questionnaire-layout)\.spec\.js/,
     },
   ],
   webServer: {
