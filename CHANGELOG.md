@@ -15,6 +15,11 @@ to `main`; a release marks a tested state worth naming.
 
 ### Fixed
 
+- Profile cards omit empty hard limits and center the QR panel when no limits are shared.
+- Your name is editable directly on Review and stays in sync with Overview and the saved list.
+- The feedback switch waits for the widget’s asynchronous configuration before treating it as ready.
+- The imprint and privacy page include the public contact address hello@getclosr.link.
+
 - Aftercare keeps the centered questionnaire layout instead of stretching across the screen.
 
 - A failed feedback load can be retried, and switching feedback off prevents a delayed load from opening it.
