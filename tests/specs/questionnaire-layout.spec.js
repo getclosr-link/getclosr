@@ -52,3 +52,30 @@ for (const viewport of [{ width: 1440, height: 960 }, { width: 390, height: 844 
     expect(saved.aftercareInCode).toBe(true);
   });
 }
+
+// Value: protects=discoverable profile naming and persisted export identity;
+// seam=synthetic name; fails_when=name can only be entered inside the hidden overview.
+test('name is editable on Review, persists after reload and reaches the shared profile', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => { state.ratings = { 3: { s: 3, g: 0, r: 0, n: 'Synthetic note' } }; saveDraft(); goToReview(); });
+  const name = page.locator('#s-review').getByLabel('Your name, shown on your card', { exact: true });
+  await expect(name).toBeVisible();
+  await name.fill('Alex');
+  await expect(page.locator('#review-title')).toHaveText("Alex's list");
+  await expect(page.locator('#s-review .fill-save-status').first()).toContainText('Saved');
+  await page.reload();
+  await page.getByRole('button', { name: 'Edit categories', exact: true }).click();
+  if (await page.locator('#s-onboard.on').count()) await page.locator('#ob-skip').click();
+  await page.locator('#s-setup button').filter({ hasText: 'Continue' }).click();
+  await page.locator('#s-fill .app-nav').getByRole('button', { name: 'Review', exact: false }).click();
+  await expect(name).toHaveValue('Alex');
+  expect(await page.evaluate(() => decode(profileQrCode()).name)).toBe('Alex');
+  await page.locator('#s-review .app-nav button').click();
+  await page.getByRole('button', { name: 'Overview', exact: true }).click();
+  await expect(page.locator('#name-input')).toHaveValue('Alex');
+  await page.locator('#name-input').fill('Sam');
+  await page.keyboard.press('Escape');
+  await page.locator('#s-fill .app-nav').getByRole('button', { name: 'Review', exact: false }).click();
+  await expect(name).toHaveValue('Sam');
+  expect(await page.evaluate(() => loadDraft().ratings[3].n)).toBe('Synthetic note');
+});

@@ -1515,6 +1515,12 @@ body.sheet-open { overflow: hidden; }
     </div>
   </header>
   <div class="review-body">
+    <div class="hl-card ov-name">
+      <label class="q-eyebrow" for="review-name-input">Your name, shown on your card</label>
+      <input class="name-input" id="review-name-input" type="text" placeholder="Optional" maxlength="40" aria-describedby="review-name-warn" oninput="updateName(this)">
+      <span class="name-warn" id="review-name-warn" role="status" hidden></span>
+      <span class="fill-save-status" role="status">—</span>
+    </div>
     <div class="review-cravings" id="review-cravings"></div>
     <div class="review-cats" id="review-cats"></div>
     <div class="hl-card">
@@ -4348,20 +4354,27 @@ function refreshHardLimitMeta(input) {
 // Say it here instead. The private code is unaffected (it truncates rather than throws),
 // so this warns without blocking.
 function refreshNameWarning(value) {
-  const warn = document.getElementById('name-warn');
-  const input = document.getElementById('name-input');
-  if (!warn) return;
   const over = utf8Length(value) > MAX_PROFILE_NAME_BYTES;
-  warn.hidden = !over;
-  warn.textContent = over
-    ? `That name is too long for a profile card — ${utf8Length(value)} of ${MAX_PROFILE_NAME_BYTES} bytes. Accented letters and emoji take more than one byte each.`
-    : '';
-  if (input) input.classList.toggle('input-err', over);
+  for (const prefix of ['', 'review-']) {
+    const warn = document.getElementById(prefix + 'name-warn');
+    const input = document.getElementById(prefix + 'name-input');
+    if (!warn) continue;
+    warn.hidden = !over;
+    warn.textContent = over
+      ? `That name is too long for a profile card — ${utf8Length(value)} of ${MAX_PROFILE_NAME_BYTES} bytes. Accented letters and emoji take more than one byte each.`
+      : '';
+    if (input) input.classList.toggle('input-err', over);
+  }
 }
 
 function updateName(input) {
   state.name = input.value;
-  refreshNameWarning(input.value);
+  for (const id of ['name-input', 'review-name-input']) {
+    const other = document.getElementById(id);
+    if (other && other !== input) other.value = state.name;
+  }
+  document.getElementById('review-title').textContent = state.name ? `${state.name}'s list` : 'Your list';
+  refreshNameWarning(state.name);
   saveDraft();
 }
 
@@ -6775,6 +6788,8 @@ function updateCatNav() {
 //  REVIEW SCREEN
 // ══════════════════════════════
 function buildReviewScreen() {
+  document.getElementById('review-name-input').value = state.name || '';
+  refreshNameWarning(state.name || '');
   const ratedTotal = countRated();
   document.getElementById('review-title').textContent = state.name ? `${state.name}'s list` : 'Your list';
   const catCount = visibleCats().length;
