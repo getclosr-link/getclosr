@@ -436,3 +436,25 @@ test.describe('card pictograms and information hierarchy', () => {
     expect(r.text).toContain('Compare with care · getclosr.link · no account, no server');
   });
 });
+
+// Value: protects=share cards with no published limits; seam=synthetic profile;
+// fails_when=an empty warning panel is drawn or its QR stops decoding.
+for (const limits of ['', '  \n  ', undefined]) {
+  test(`profile card omits empty hard limits: ${JSON.stringify(limits)}`, async ({ page }) => {
+    await seedState(page, { name: 'Alex', ratings: { 3: { s: 3, g: 0, r: 0, n: '' } }, hardLimits: limits });
+    const rendered = await page.evaluate(() => {
+      const seen = [], original = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (text, ...args) { seen.push(String(text)); return original.call(this, text, ...args); };
+      let card;
+      try { card = buildProfileCard(); } finally { CanvasRenderingContext2D.prototype.fillText = original; }
+      return { text: seen.join('\n'), pixel: [...card.getContext('2d').getImageData(80, 1100, 1, 1).data], qr: card.qrRect, width: card.width };
+    });
+    expect(rendered.text).not.toContain('HARD LIMITS');
+    expect(rendered.text).not.toContain('No hard limits');
+    expect(rendered.pixel).toEqual([28, 26, 62, 255]);
+    expect(rendered.qr.x + rendered.qr.size / 2).toBe(rendered.width / 2);
+    const payload = await page.evaluate(readCardQr);
+    const decoded = jsQR(Uint8ClampedArray.from(payload.pixels), payload.size, payload.size);
+    expect(decoded?.data).toBe(payload.url);
+  });
+}

@@ -1515,6 +1515,12 @@ body.sheet-open { overflow: hidden; }
     </div>
   </header>
   <div class="review-body">
+    <div class="hl-card ov-name">
+      <label class="q-eyebrow" for="review-name-input">Your name, shown on your card</label>
+      <input class="name-input" id="review-name-input" type="text" placeholder="Optional" maxlength="40" aria-describedby="review-name-warn" oninput="updateName(this)">
+      <span class="name-warn" id="review-name-warn" role="status" hidden></span>
+      <span class="fill-save-status" role="status">—</span>
+    </div>
     <div class="review-cravings" id="review-cravings"></div>
     <div class="review-cats" id="review-cats"></div>
     <div class="hl-card">
@@ -4348,20 +4354,27 @@ function refreshHardLimitMeta(input) {
 // Say it here instead. The private code is unaffected (it truncates rather than throws),
 // so this warns without blocking.
 function refreshNameWarning(value) {
-  const warn = document.getElementById('name-warn');
-  const input = document.getElementById('name-input');
-  if (!warn) return;
   const over = utf8Length(value) > MAX_PROFILE_NAME_BYTES;
-  warn.hidden = !over;
-  warn.textContent = over
-    ? `That name is too long for a profile card — ${utf8Length(value)} of ${MAX_PROFILE_NAME_BYTES} bytes. Accented letters and emoji take more than one byte each.`
-    : '';
-  if (input) input.classList.toggle('input-err', over);
+  for (const prefix of ['', 'review-']) {
+    const warn = document.getElementById(prefix + 'name-warn');
+    const input = document.getElementById(prefix + 'name-input');
+    if (!warn) continue;
+    warn.hidden = !over;
+    warn.textContent = over
+      ? `That name is too long for a profile card — ${utf8Length(value)} of ${MAX_PROFILE_NAME_BYTES} bytes. Accented letters and emoji take more than one byte each.`
+      : '';
+    if (input) input.classList.toggle('input-err', over);
+  }
 }
 
 function updateName(input) {
   state.name = input.value;
-  refreshNameWarning(input.value);
+  for (const id of ['name-input', 'review-name-input']) {
+    const other = document.getElementById(id);
+    if (other && other !== input) other.value = state.name;
+  }
+  document.getElementById('review-title').textContent = state.name ? `${state.name}'s list` : 'Your list';
+  refreshNameWarning(state.name);
   saveDraft();
 }
 
@@ -5115,8 +5128,8 @@ function canvasKit(d) {
 // right. A fixed 300 px QR area keeps the cards at a fixed 3:4; the QR inside is drawn at
 // whole pixels per module, which still decodes for the longest legal profile.
 const CARD_QR_PANEL = { x: 1080 - 56 - 348, y: 1008, size: 348, qr: 300 };
-function drawCardQrPanel(kit, caps, url, caption, C) {
-  const { x, y, size, qr } = CARD_QR_PANEL;
+function drawCardQrPanel(kit, caps, url, caption, C, x = CARD_QR_PANEL.x) {
+  const { y, size, qr } = CARD_QR_PANEL;
   caps(caption, x, y - 18, 20, C.accent);
   kit.box(x, y, size, size, C.surface, C.rule, 22);
   const inset = (size - qr) / 2;
@@ -5197,14 +5210,17 @@ function buildProfileCard() {
   // Bottom row: hard limits left, QR panel right, both on the same caption line.
   const { y: rowTop, size: rowH } = CARD_QR_PANEL;
   const limitsW = CARD_QR_PANEL.x - 24 - PAD;
-  drawIcon('shield-check', PAD, rowTop - 42, 26, T[1].fg);
-  caps('HARD LIMITS', PAD + 36, rowTop - 18, 20, T[1].fg);
-  box(PAD, rowTop, limitsW, rowH, T[1].bg, T[1].br, 22);
-  const limits = String(state.hardLimits || '').trim() || 'No hard limits shared on this profile.';
-  let limitFont = sans(600, 22), lineH = 30, limitLines = splitLines(limits, limitFont, limitsW - 52);
-  if (limitLines.length > 9) { limitFont = sans(600, 18); lineH = 24; limitLines = splitLines(limits, limitFont, limitsW - 52); }
-  limitLines.slice(0, 12).forEach((line, i) => label(line, PAD + 26, rowTop + 46 + i * lineH, limitFont, C.ink));
-  const qrRect = drawCardQrPanel(kit, caps, qrUrl, 'SCAN TO COMPARE WITH ME', C);
+  const limits = String(state.hardLimits || '').trim();
+  if (limits) {
+    drawIcon('shield-check', PAD, rowTop - 42, 26, T[1].fg);
+    caps('HARD LIMITS', PAD + 36, rowTop - 18, 20, T[1].fg);
+    box(PAD, rowTop, limitsW, rowH, T[1].bg, T[1].br, 22);
+    let limitFont = sans(600, 22), lineH = 30, limitLines = splitLines(limits, limitFont, limitsW - 52);
+    if (limitLines.length > 9) { limitFont = sans(600, 18); lineH = 24; limitLines = splitLines(limits, limitFont, limitsW - 52); }
+    limitLines.slice(0, 12).forEach((line, i) => label(line, PAD + 26, rowTop + 46 + i * lineH, limitFont, C.ink));
+  }
+  const qrX = limits ? CARD_QR_PANEL.x : (W - CARD_QR_PANEL.size) / 2;
+  const qrRect = drawCardQrPanel(kit, caps, qrUrl, 'SCAN TO COMPARE WITH ME', C, qrX);
 
   d.strokeStyle = C.rule; d.lineWidth = 2; d.beginPath(); d.moveTo(PAD, H - 56); d.lineTo(W - PAD, H - 56); d.stroke();
   label('Compare with care · getclosr.link · no account, no server', PAD, H - 24, sans(600, 18), C.muted);
@@ -6391,7 +6407,7 @@ function buildFillScreen() {
   const list = document.getElementById('act-list');
 
   if (state.activeCatId === 'aftercare') {
-    list.innerHTML = buildAftercareCard(cats.length) + buildFillNavButtons(cats);
+    list.innerHTML = `<section class="q-stage">${buildAftercareCard(cats.length)}${buildFillNavButtons(cats)}</section>`;
     return;
   }
   const activeCat = cats.find(c => c.id === state.activeCatId) || cats[0];
@@ -6772,6 +6788,8 @@ function updateCatNav() {
 //  REVIEW SCREEN
 // ══════════════════════════════
 function buildReviewScreen() {
+  document.getElementById('review-name-input').value = state.name || '';
+  refreshNameWarning(state.name || '');
   const ratedTotal = countRated();
   document.getElementById('review-title').textContent = state.name ? `${state.name}'s list` : 'Your list';
   const catCount = visibleCats().length;
@@ -7468,20 +7486,36 @@ function feedbackToggle(force) {
   s.dataset.project = 'fk_pub_3c8e51a07d2b';
   s.dataset.base = '/fk';
   s.setAttribute('data-fk-loader', '');
+  btn.setAttribute('aria-busy', 'true');
+  let readyObserver, readyTimer;
+  const stopWaiting = () => { readyObserver?.disconnect(); clearTimeout(readyTimer); };
   const isCurrent = () => document.querySelector('script[data-fk-loader]') === s;
   s.onerror = () => {
     if (!isCurrent()) return;
+    stopWaiting();
     s.remove();
+    btn.setAttribute('aria-busy', 'false');
     btn.setAttribute('aria-checked', 'false');
     document.getElementById('feedback-status').textContent = 'Feedback could not load. Turn the switch on to try again.';
   };
   s.onload = () => {
     if (!isCurrent()) return;
-    if (!window.FeedbackKit) { s.onerror(); return; }
-    const enabled = btn.getAttribute('aria-checked') === 'true';
-    const loadedHost = document.querySelector('[data-feedbackkit="host"]');
-    if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
-    if (enabled) window.FeedbackKit.open();
+    // Widget boot awaits its configuration before exposing FeedbackKit.open().
+    const finishWhenReady = () => {
+      if (!isCurrent()) { stopWaiting(); return; }
+      if (!window.FeedbackKit) return;
+      stopWaiting();
+      btn.setAttribute('aria-busy', 'false');
+      const enabled = btn.getAttribute('aria-checked') === 'true';
+      const loadedHost = document.querySelector('[data-feedbackkit="host"]');
+      if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
+      document.getElementById('feedback-status').textContent = '';
+      if (enabled) window.FeedbackKit.open();
+    };
+    readyObserver = new MutationObserver(finishWhenReady);
+    readyObserver.observe(document.body, { childList: true, subtree: true });
+    readyTimer = setTimeout(() => { if (!window.FeedbackKit) s.onerror(); }, 15000);
+    finishWhenReady();
   };
   document.body.appendChild(s);
 }
