@@ -7486,20 +7486,36 @@ function feedbackToggle(force) {
   s.dataset.project = 'fk_pub_3c8e51a07d2b';
   s.dataset.base = '/fk';
   s.setAttribute('data-fk-loader', '');
+  btn.setAttribute('aria-busy', 'true');
+  let readyObserver, readyTimer;
+  const stopWaiting = () => { readyObserver?.disconnect(); clearTimeout(readyTimer); };
   const isCurrent = () => document.querySelector('script[data-fk-loader]') === s;
   s.onerror = () => {
     if (!isCurrent()) return;
+    stopWaiting();
     s.remove();
+    btn.setAttribute('aria-busy', 'false');
     btn.setAttribute('aria-checked', 'false');
     document.getElementById('feedback-status').textContent = 'Feedback could not load. Turn the switch on to try again.';
   };
   s.onload = () => {
     if (!isCurrent()) return;
-    if (!window.FeedbackKit) { s.onerror(); return; }
-    const enabled = btn.getAttribute('aria-checked') === 'true';
-    const loadedHost = document.querySelector('[data-feedbackkit="host"]');
-    if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
-    if (enabled) window.FeedbackKit.open();
+    // Widget boot awaits its configuration before exposing FeedbackKit.open().
+    const finishWhenReady = () => {
+      if (!isCurrent()) { stopWaiting(); return; }
+      if (!window.FeedbackKit) return;
+      stopWaiting();
+      btn.setAttribute('aria-busy', 'false');
+      const enabled = btn.getAttribute('aria-checked') === 'true';
+      const loadedHost = document.querySelector('[data-feedbackkit="host"]');
+      if (loadedHost) loadedHost.style.display = enabled ? '' : 'none';
+      document.getElementById('feedback-status').textContent = '';
+      if (enabled) window.FeedbackKit.open();
+    };
+    readyObserver = new MutationObserver(finishWhenReady);
+    readyObserver.observe(document.body, { childList: true, subtree: true });
+    readyTimer = setTimeout(() => { if (!window.FeedbackKit) s.onerror(); }, 15000);
+    finishWhenReady();
   };
   document.body.appendChild(s);
 }

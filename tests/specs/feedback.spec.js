@@ -115,3 +115,35 @@ test('off and on during one pending feedback load keeps a single request', async
   expect(requests).toBe(1);
   await expect(page.locator('script[data-fk-loader]')).toHaveCount(1);
 });
+
+// Value: protects=the real widget's async configuration/init contract; the public API
+// is set after script load, not during it. No feedback messages are submitted.
+for (const leaveEnabled of [true, false]) {
+  test(`feedback waits for async widget initialization, enabled=${leaveEnabled}`, async ({ page }) => {
+    let release, configRequests = 0;
+    const gate = new Promise(resolve => { release = resolve; });
+    const asyncWidget = 'const initScript = document.currentScript; (async () => { await fetch("/fk/api/config");' +
+      STUB.replace('const s = document.currentScript;', 'const s = initScript;') + '})();';
+    await page.route('**/fk/widget.js', route => route.fulfill({ contentType: 'application/javascript', body: asyncWidget }));
+    await page.route('**/fk/api/config', async route => { configRequests++; await gate; await route.fulfill({ json: { enabled: true } }); });
+    await page.goto('/');
+    const sw = page.getByRole('switch', { name: 'Send feedback' });
+    await sw.click();
+    await expect.poll(() => configRequests).toBe(1);
+    await expect(sw).toHaveAttribute('aria-checked', 'true');
+    await expect(sw).toHaveAttribute('aria-busy', 'true');
+    await expect(page.locator('#feedback-status')).not.toContainText('could not load');
+    if (!leaveEnabled) await sw.click();
+    release();
+    await expect.poll(() => page.evaluate(() => !!window.FeedbackKit)).toBe(true);
+    await expect(sw).toHaveAttribute('aria-busy', 'false');
+    await expect(sw).toHaveAttribute('aria-checked', String(leaveEnabled));
+    expect(await page.evaluate(() => window.__fk.opens)).toBe(leaveEnabled ? 1 : 0);
+    if (!leaveEnabled) {
+      await expect(page.locator('[data-feedbackkit="host"]')).toBeHidden();
+      await sw.click();
+      await expect.poll(() => page.evaluate(() => window.__fk.opens)).toBe(1);
+      expect(configRequests).toBe(1);
+    }
+  });
+}
