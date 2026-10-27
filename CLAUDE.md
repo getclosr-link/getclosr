@@ -14,3 +14,16 @@ Before every session end, every "I'll stop here" and every blocked message: **co
 Everything that lands in this repo is English: UI copy, code comments, docs, tests, commit messages, PR titles, PR bodies, issues and all comments (including automated triage runs). Chat with the maintainers may stay German.
 
 Skill routing is defined globally in `~/.claude/CLAUDE.md`; don't duplicate it here.
+
+## gstack (recommended)
+
+This project uses [gstack](https://github.com/garrytan/gstack) for AI-assisted workflows.
+Install it for the best experience:
+
+```bash
+git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+cd ~/.claude/skills/gstack && ./setup --team
+```
+
+Skills like /qa, /ship, /review, /investigate, and /browse become available after install.
+Use /browse for all web browsing (Aside first, the bundled gstack browser as fallback). Use ~/.claude/skills/gstack/... for gstack file paths.
