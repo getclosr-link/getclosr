@@ -8,6 +8,7 @@
   <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/code-AGPL--3.0-7a0f35?style=flat-square&labelColor=1c1a3e"></a>
   <a href="LICENSE-CONTENT.md"><img alt="Content: CC BY-SA 4.0" src="https://img.shields.io/badge/content-CC%20BY--SA%204.0-d14836?style=flat-square&labelColor=1c1a3e"></a>
   <a href="https://github.com/getclosr-link/getclosr/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/getclosr-link/getclosr?style=flat-square&labelColor=1c1a3e&color=ff9398"></a>
+  <a href="https://github.com/sponsors/getclosr-link"><img alt="Sponsor" src="https://img.shields.io/badge/sponsor-getClosr-ff9398?style=flat-square&logo=githubsponsors&logoColor=ff9398&labelColor=1c1a3e"></a>
   <img alt="No build step" src="https://img.shields.io/badge/build-none-37346a?style=flat-square&labelColor=1c1a3e">
 </p>
 
@@ -213,7 +214,7 @@ Copyright © getClosr contributors
 
 ## Support
 
-getClosr is free and has no subscription or ads. If it helped you, you can [buy me a coffee](https://buymeacoffee.com/madsbergstroem).
+getClosr is free and has no subscription or ads, but the domain and hosting cost a little every month. If it helped you, you can [sponsor getClosr on GitHub](https://github.com/sponsors/getclosr-link). Sponsorships cover the running costs first; anything left over goes into new activities, translations and accessibility.
 
 ---
 

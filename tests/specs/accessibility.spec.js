@@ -37,11 +37,6 @@ test('summary filters and activity disclosures work from the keyboard', async ({
 });
 
 async function openDialog(page, kind) {
-  await page.route('https://buymeacoffee.com/**', route => route.fulfill({ body: 'Synthetic widget' }));
-  if (kind === 'coffee-sheet') {
-    const opener = page.locator('.l-footer a.bmc-link');
-    await opener.click(); return opener;
-  }
   await page.evaluate(() => {
     state.name = 'Alex'; state.ratings = { 3: { s: 3, g: 0, r: 0, n: '' } }; saveDraft();
   });
@@ -62,7 +57,7 @@ async function openDialog(page, kind) {
   await opener.click(); return opener;
 }
 
-for (const kind of ['share-sheet', 'import-modal', 'coffee-sheet', 'fill-overview']) {
+for (const kind of ['share-sheet', 'import-modal', 'fill-overview']) {
   test(`${kind} moves, contains and restores keyboard focus`, async ({ page }) => {
     const opener = await openDialog(page, kind);
     const dialog = page.locator('#' + kind);

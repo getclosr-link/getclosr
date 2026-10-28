@@ -13,6 +13,10 @@ to `main`; a release marks a tested state worth naming.
 
 ## [Unreleased]
 
+### Changed
+
+- Support moved from Buy Me a Coffee to [GitHub Sponsors](https://github.com/sponsors/getclosr-link) for the organization. The footer link is a plain link; the embedded payment form and its privacy section are gone, and no personal handle ships with the site.
+
 ## [1.1.0] - 2026-10-25
 
 ### Changed

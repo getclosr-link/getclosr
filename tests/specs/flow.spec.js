@@ -179,37 +179,22 @@ test.describe('v2-specific hardening', () => {
     }
   });
 
-  test('deployed assets carry no identity beyond the donation handle', async ({ page }) => {
-    // The support link is public by design; nothing else about the author is. A stale deploy
-    // once shipped internal notes that tied that handle to other accounts, so this pins the
-    // shape rather than the words: the deployed files may name the handle, and nothing else.
-    // The terms themselves are deliberately not listed here — a denylist in a public repo
-    // republishes exactly what it is meant to protect. Keep the check structural.
-    const allowedHandle = 'madsbergstroem';
+  test('deployed assets carry no personal support handle', async ({ page }) => {
+    // No personal handle or account name ships with the site: support goes through the
+    // organization's GitHub Sponsors page. Keep the check structural, not a list of names.
     for (const path of ['/', '/404.html', '/robots.txt']) {
       const body = (await (await page.request.get(path)).text()).toLowerCase();
-      // Every occurrence of the handle must sit inside a Buy-Me-a-Coffee URL (page or widget).
-      const loose = body.split(allowedHandle).length - 1;
-      const inUrl = (body.match(new RegExp(`buymeacoffee\\.com/(widget/page/)?${allowedHandle}`, 'g')) || []).length;
-      expect(loose, `${path} names the handle outside the support link`).toBe(inUrl);
+      expect(body, `${path} links to a personal support page`).not.toMatch(/buymeacoffee\.com|ko-fi\.com|patreon\.com/);
     }
   });
 
-  test('the coffee link opens the embedded form only on tap, and keeps a plain link as fallback', async ({ page }) => {
-    // Keep the test offline: the widget host is stubbed, only the request itself matters.
-    const widgetHits = [];
-    await page.route('https://buymeacoffee.com/**', route => { widgetHits.push(route.request().url()); route.fulfill({ body: 'stub' }); });
-    const link = page.locator('.l-footer a.bmc-link');
-    // Without JS the link still reaches the supporter page.
-    await expect(link).toHaveAttribute('href', 'https://buymeacoffee.com/madsbergstroem');
-    expect(await page.locator('#coffee-frame').getAttribute('src')).toBeNull();
-    expect(widgetHits).toEqual([]);
-    await link.click();
-    await expect(page.locator('#coffee-sheet')).toHaveClass(/on/);
-    await expect(page.locator('#coffee-frame')).toHaveAttribute('src', /buymeacoffee\.com\/widget\/page\/madsbergstroem/);
-    await expect.poll(() => widgetHits.length).toBeGreaterThan(0);
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#coffee-sheet')).not.toHaveClass(/on/);
+  test('the sponsor link is a plain link to the organization and loads nothing on the page', async ({ page }) => {
+    const external = [];
+    page.on('request', r => { if (!r.url().startsWith(new URL(page.url() || 'http://x').origin)) external.push(r.url()); });
+    const link = page.locator('.l-footer a#sponsor-link');
+    await expect(link).toHaveAttribute('href', 'https://github.com/sponsors/getclosr-link');
+    await expect(link).toHaveAttribute('rel', /noopener/);
+    expect(external.filter(u => u.includes('github.com'))).toEqual([]);
   });
 
   test('the footer links to the own imprint, which names the project and its GitHub org only', async ({ page }) => {
