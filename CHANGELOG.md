@@ -17,6 +17,12 @@ to `main`; a release marks a tested state worth naming.
 
 - Support moved from Buy Me a Coffee to [GitHub Sponsors](https://github.com/sponsors/getclosr-link) for the organization. The footer link is a plain link; the embedded payment form and its privacy section are gone, and no personal handle ships with the site.
 
+## [1.1.0] - 2026-10-25
+
+### Changed
+
+- README with banner, icons, tech logos, how to report a problem and an "Under the hood" section with an architecture diagram.
+
 ### Fixed
 
 - Profile cards omit empty hard limits and center the QR panel when no limits are shared.
@@ -30,6 +36,8 @@ to `main`; a release marks a tested state worth naming.
 - Oversized private and group exports explain how to reduce the code before copying it.
 - Editing your own code after a reload retains your saved answers and aftercare sharing choice.
 - A failed comparison save keeps the form open and reports the storage error so you can retry.
+- Preview builds for branches on Cloudflare Workers.
+- Playwright updated to 1.64.1 for the test suite.
 
 ## [1.0.0] - 2026-10-24
 
@@ -57,5 +65,6 @@ The first public release, on its own domain and under its own organization.
 - Escape now closes the feedback panel from anywhere and unlocks page scrolling.
 - Dark, thin scrollbar that matches the design.
 
-[Unreleased]: https://github.com/getclosr-link/getclosr/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/getclosr-link/getclosr/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/getclosr-link/getclosr/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/getclosr-link/getclosr/releases/tag/v1.0.0
