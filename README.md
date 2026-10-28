@@ -18,6 +18,10 @@
 </p>
 
 <p align="center">
+  <sub><b>For adults.</b> The checklist names sexual activities and kink practices plainly, so it is not meant for anyone under 18.</sub>
+</p>
+
+<p align="center">
   <a href="https://getclosr.link"><img alt="Open getClosr" src="https://img.shields.io/badge/Open_getClosr-%E2%86%92-ff9398?style=for-the-badge&labelColor=7a0f35"></a>
 </p>
 
